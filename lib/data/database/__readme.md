@@ -1,0 +1,1 @@
+# LUỒNG DỮ LIỆU: UI ↔ Model ↔ Mapper ↔ DAO ↔ Drift Table ↔ SQLite
