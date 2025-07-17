@@ -14,7 +14,8 @@ dependencies:
 
   cupertino_icons: ^1.0.8
 
-  sqflite: ^2.3.0
+  drift: ^2.13.0
+  sqlite3_flutter_libs: any
   path_provider: ^2.0.14
   path: ^1.9.0
   provider: ^6.1.0
@@ -29,12 +30,27 @@ dependencies:
   lottie: ^2.6.0
   table_calendar: ^3.0.8
   url_launcher: ^6.2.5
+  flutter_riverpod: ^2.6.1
+
+  page_flip: ^0.2.5+1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  drift_dev: ^2.13.0
+  build_runner: any
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/emoji_default/
+    - assets/sticker/
 
+  fonts:
+    - family: PlaywriteVNGuides
+      fonts:
+        - asset: assets/fonts/PlaywriteVNGuides-Regular.ttf
+    - family: DFVN
+      fonts:
+        - asset: assets/fonts/DFVN-Excalifont.ttf

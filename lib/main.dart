@@ -1,66 +1,66 @@
+import 'package:a_new_day/data/models/mood_model.dart';
+import 'package:a_new_day/features/mood_journal/mood_detail/mood_edit_screen.dart';
+import 'package:a_new_day/features/mood_journal/mood_list/mood_list_screen.dart';
+import 'package:a_new_day/features/mood_journal/mood_view/mood_view_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'core/theme/dark_theme.dart';
+import 'core/theme/light_theme.dart';
+import 'features/mood_journal/emoji_repository.dart';
+import 'features/mood_journal/mood_add/mood_add_screen.dart';
+import 'features/mood_journal/mood_home/mood_home_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+      ProviderScope(
+          child: const MyApp()
+      )
+  );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerStatefulWidget  {
   const MyApp({super.key});
 
   @override
+  ConsumerState<MyApp> createState() => _MyAppState();
+
+}
+class _MyAppState extends ConsumerState<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(emojisNotifierProvider);
+  }
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      title: 'Một ngày mới',
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: ThemeMode.light,
+      onGenerateRoute: (settings) {
+          switch (settings.name) {
+            case '/mood-home':
+              return MaterialPageRoute(builder: (_) => MoodHomeScreen());
+            case '/mood-add':
+              return MaterialPageRoute(builder: (_) => AddMoodScreen());
+            case '/mood-list':
+              return MaterialPageRoute(builder: (_) => MoodListScreen());
+            case '/mood-edit':
+              final mood = settings.arguments as MoodModel;
+              return MaterialPageRoute(
+                builder: (_) => MoodEditScreen(mood: mood),
+              );
+            case '/mood-view':
+              final mood = settings.arguments as MoodModel;
+              return MaterialPageRoute(
+                builder: (_) => MoodViewScreen(mood: mood),
+              );
+          }
+      },
+      home: MoodHomeScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-}
