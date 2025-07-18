@@ -7,6 +7,8 @@ import '../../../core/utils/tool.dart';
 import '../../../data/models/mood_model.dart';
 import '../emoji_repository.dart';
 import '../mood_list/mood_list_controller.dart';
+import '../mood_widget/input_audio.dart';
+import '../mood_widget/pick_image.dart';
 
 class AddMoodScreen extends ConsumerStatefulWidget {
   const AddMoodScreen({super.key});
@@ -21,6 +23,9 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
   String note = '';
   final _sloganController = TextEditingController();
   final _noteController = TextEditingController();
+
+  String? iconPath , _savedAudioPath ;
+
 
   @override
   void dispose() {
@@ -104,6 +109,29 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
 
                 const SizedBox(height: 30),
 
+                IconInput(
+                  initialIconPath: '',
+                  onIconPicked: (path) {
+                    if(path!=null){
+                      iconPath = path;
+                      // print("Đã nhận ảnh: $iconPath");
+                    }
+                  },
+                ),
+
+                const SizedBox(height: 30),
+
+                AudioRecorderWidget(
+                  initialAudioPath: _savedAudioPath,
+                  onAudioSaved: (path) {
+                    setState(() {
+                      _savedAudioPath = path;
+                      // print("Đã nhận file: $_savedAudioPath");
+                    });
+                    // print('Đường dẫn audio đã lưu: $path');
+                  },
+                ),
+
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -112,12 +140,16 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
                         date: DateTime.now(),
                         emoji: '$selectedEmojiPath|$slogan',
                         note: note.isEmpty ? null : note,
+                        image: iconPath ?? null,
+                        audio: _savedAudioPath ?? null,
                       );
+                      print(newMood.toString());
                       await ref.read(moodListProvider.notifier).insertMood(newMood);
 
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nhật ký đã được lưu trữ')));
+                      Navigator.pushNamedAndRemoveUntil(context, '/mood-home', (router)=>false);
                     },
-                    child: const Text('Lưu Mood'),
+                    child: const Text('Lưu nhật ký'),
                   ),
                 ),
               ],

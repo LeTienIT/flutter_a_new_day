@@ -794,6 +794,24 @@ class $MoodsTable extends Moods with TableInfo<$MoodsTable, Mood> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _imageMeta = const VerificationMeta('image');
+  @override
+  late final GeneratedColumn<String> image = GeneratedColumn<String>(
+    'image',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _audioMeta = const VerificationMeta('audio');
+  @override
+  late final GeneratedColumn<String> audio = GeneratedColumn<String>(
+    'audio',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _noteMeta = const VerificationMeta('note');
   @override
   late final GeneratedColumn<String> note = GeneratedColumn<String>(
@@ -804,7 +822,7 @@ class $MoodsTable extends Moods with TableInfo<$MoodsTable, Mood> {
     requiredDuringInsert: false,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, date, emoji, note];
+  List<GeneratedColumn> get $columns => [id, date, emoji, image, audio, note];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -835,6 +853,18 @@ class $MoodsTable extends Moods with TableInfo<$MoodsTable, Mood> {
       );
     } else if (isInserting) {
       context.missing(_emojiMeta);
+    }
+    if (data.containsKey('image')) {
+      context.handle(
+        _imageMeta,
+        image.isAcceptableOrUnknown(data['image']!, _imageMeta),
+      );
+    }
+    if (data.containsKey('audio')) {
+      context.handle(
+        _audioMeta,
+        audio.isAcceptableOrUnknown(data['audio']!, _audioMeta),
+      );
     }
     if (data.containsKey('note')) {
       context.handle(
@@ -870,6 +900,14 @@ class $MoodsTable extends Moods with TableInfo<$MoodsTable, Mood> {
             DriftSqlType.string,
             data['${effectivePrefix}emoji'],
           )!,
+      image: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}image'],
+      ),
+      audio: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}audio'],
+      ),
       note: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}note'],
@@ -887,11 +925,15 @@ class Mood extends DataClass implements Insertable<Mood> {
   final int id;
   final DateTime date;
   final String emoji;
+  final String? image;
+  final String? audio;
   final String? note;
   const Mood({
     required this.id,
     required this.date,
     required this.emoji,
+    this.image,
+    this.audio,
     this.note,
   });
   @override
@@ -900,6 +942,12 @@ class Mood extends DataClass implements Insertable<Mood> {
     map['id'] = Variable<int>(id);
     map['date'] = Variable<DateTime>(date);
     map['emoji'] = Variable<String>(emoji);
+    if (!nullToAbsent || image != null) {
+      map['image'] = Variable<String>(image);
+    }
+    if (!nullToAbsent || audio != null) {
+      map['audio'] = Variable<String>(audio);
+    }
     if (!nullToAbsent || note != null) {
       map['note'] = Variable<String>(note);
     }
@@ -911,6 +959,10 @@ class Mood extends DataClass implements Insertable<Mood> {
       id: Value(id),
       date: Value(date),
       emoji: Value(emoji),
+      image:
+          image == null && nullToAbsent ? const Value.absent() : Value(image),
+      audio:
+          audio == null && nullToAbsent ? const Value.absent() : Value(audio),
       note: note == null && nullToAbsent ? const Value.absent() : Value(note),
     );
   }
@@ -924,6 +976,8 @@ class Mood extends DataClass implements Insertable<Mood> {
       id: serializer.fromJson<int>(json['id']),
       date: serializer.fromJson<DateTime>(json['date']),
       emoji: serializer.fromJson<String>(json['emoji']),
+      image: serializer.fromJson<String?>(json['image']),
+      audio: serializer.fromJson<String?>(json['audio']),
       note: serializer.fromJson<String?>(json['note']),
     );
   }
@@ -934,6 +988,8 @@ class Mood extends DataClass implements Insertable<Mood> {
       'id': serializer.toJson<int>(id),
       'date': serializer.toJson<DateTime>(date),
       'emoji': serializer.toJson<String>(emoji),
+      'image': serializer.toJson<String?>(image),
+      'audio': serializer.toJson<String?>(audio),
       'note': serializer.toJson<String?>(note),
     };
   }
@@ -942,11 +998,15 @@ class Mood extends DataClass implements Insertable<Mood> {
     int? id,
     DateTime? date,
     String? emoji,
+    Value<String?> image = const Value.absent(),
+    Value<String?> audio = const Value.absent(),
     Value<String?> note = const Value.absent(),
   }) => Mood(
     id: id ?? this.id,
     date: date ?? this.date,
     emoji: emoji ?? this.emoji,
+    image: image.present ? image.value : this.image,
+    audio: audio.present ? audio.value : this.audio,
     note: note.present ? note.value : this.note,
   );
   Mood copyWithCompanion(MoodsCompanion data) {
@@ -954,6 +1014,8 @@ class Mood extends DataClass implements Insertable<Mood> {
       id: data.id.present ? data.id.value : this.id,
       date: data.date.present ? data.date.value : this.date,
       emoji: data.emoji.present ? data.emoji.value : this.emoji,
+      image: data.image.present ? data.image.value : this.image,
+      audio: data.audio.present ? data.audio.value : this.audio,
       note: data.note.present ? data.note.value : this.note,
     );
   }
@@ -964,13 +1026,15 @@ class Mood extends DataClass implements Insertable<Mood> {
           ..write('id: $id, ')
           ..write('date: $date, ')
           ..write('emoji: $emoji, ')
+          ..write('image: $image, ')
+          ..write('audio: $audio, ')
           ..write('note: $note')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, date, emoji, note);
+  int get hashCode => Object.hash(id, date, emoji, image, audio, note);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -978,6 +1042,8 @@ class Mood extends DataClass implements Insertable<Mood> {
           other.id == this.id &&
           other.date == this.date &&
           other.emoji == this.emoji &&
+          other.image == this.image &&
+          other.audio == this.audio &&
           other.note == this.note);
 }
 
@@ -985,17 +1051,23 @@ class MoodsCompanion extends UpdateCompanion<Mood> {
   final Value<int> id;
   final Value<DateTime> date;
   final Value<String> emoji;
+  final Value<String?> image;
+  final Value<String?> audio;
   final Value<String?> note;
   const MoodsCompanion({
     this.id = const Value.absent(),
     this.date = const Value.absent(),
     this.emoji = const Value.absent(),
+    this.image = const Value.absent(),
+    this.audio = const Value.absent(),
     this.note = const Value.absent(),
   });
   MoodsCompanion.insert({
     this.id = const Value.absent(),
     required DateTime date,
     required String emoji,
+    this.image = const Value.absent(),
+    this.audio = const Value.absent(),
     this.note = const Value.absent(),
   }) : date = Value(date),
        emoji = Value(emoji);
@@ -1003,12 +1075,16 @@ class MoodsCompanion extends UpdateCompanion<Mood> {
     Expression<int>? id,
     Expression<DateTime>? date,
     Expression<String>? emoji,
+    Expression<String>? image,
+    Expression<String>? audio,
     Expression<String>? note,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (date != null) 'date': date,
       if (emoji != null) 'emoji': emoji,
+      if (image != null) 'image': image,
+      if (audio != null) 'audio': audio,
       if (note != null) 'note': note,
     });
   }
@@ -1017,12 +1093,16 @@ class MoodsCompanion extends UpdateCompanion<Mood> {
     Value<int>? id,
     Value<DateTime>? date,
     Value<String>? emoji,
+    Value<String?>? image,
+    Value<String?>? audio,
     Value<String?>? note,
   }) {
     return MoodsCompanion(
       id: id ?? this.id,
       date: date ?? this.date,
       emoji: emoji ?? this.emoji,
+      image: image ?? this.image,
+      audio: audio ?? this.audio,
       note: note ?? this.note,
     );
   }
@@ -1039,6 +1119,12 @@ class MoodsCompanion extends UpdateCompanion<Mood> {
     if (emoji.present) {
       map['emoji'] = Variable<String>(emoji.value);
     }
+    if (image.present) {
+      map['image'] = Variable<String>(image.value);
+    }
+    if (audio.present) {
+      map['audio'] = Variable<String>(audio.value);
+    }
     if (note.present) {
       map['note'] = Variable<String>(note.value);
     }
@@ -1051,6 +1137,8 @@ class MoodsCompanion extends UpdateCompanion<Mood> {
           ..write('id: $id, ')
           ..write('date: $date, ')
           ..write('emoji: $emoji, ')
+          ..write('image: $image, ')
+          ..write('audio: $audio, ')
           ..write('note: $note')
           ..write(')'))
         .toString();
@@ -1802,6 +1890,8 @@ typedef $$MoodsTableCreateCompanionBuilder =
       Value<int> id,
       required DateTime date,
       required String emoji,
+      Value<String?> image,
+      Value<String?> audio,
       Value<String?> note,
     });
 typedef $$MoodsTableUpdateCompanionBuilder =
@@ -1809,6 +1899,8 @@ typedef $$MoodsTableUpdateCompanionBuilder =
       Value<int> id,
       Value<DateTime> date,
       Value<String> emoji,
+      Value<String?> image,
+      Value<String?> audio,
       Value<String?> note,
     });
 
@@ -1832,6 +1924,16 @@ class $$MoodsTableFilterComposer extends Composer<_$AppDatabase, $MoodsTable> {
 
   ColumnFilters<String> get emoji => $composableBuilder(
     column: $table.emoji,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get image => $composableBuilder(
+    column: $table.image,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get audio => $composableBuilder(
+    column: $table.audio,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1865,6 +1967,16 @@ class $$MoodsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get image => $composableBuilder(
+    column: $table.image,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get audio => $composableBuilder(
+    column: $table.audio,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get note => $composableBuilder(
     column: $table.note,
     builder: (column) => ColumnOrderings(column),
@@ -1888,6 +2000,12 @@ class $$MoodsTableAnnotationComposer
 
   GeneratedColumn<String> get emoji =>
       $composableBuilder(column: $table.emoji, builder: (column) => column);
+
+  GeneratedColumn<String> get image =>
+      $composableBuilder(column: $table.image, builder: (column) => column);
+
+  GeneratedColumn<String> get audio =>
+      $composableBuilder(column: $table.audio, builder: (column) => column);
 
   GeneratedColumn<String> get note =>
       $composableBuilder(column: $table.note, builder: (column) => column);
@@ -1924,19 +2042,31 @@ class $$MoodsTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<DateTime> date = const Value.absent(),
                 Value<String> emoji = const Value.absent(),
+                Value<String?> image = const Value.absent(),
+                Value<String?> audio = const Value.absent(),
                 Value<String?> note = const Value.absent(),
-              }) =>
-                  MoodsCompanion(id: id, date: date, emoji: emoji, note: note),
+              }) => MoodsCompanion(
+                id: id,
+                date: date,
+                emoji: emoji,
+                image: image,
+                audio: audio,
+                note: note,
+              ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required DateTime date,
                 required String emoji,
+                Value<String?> image = const Value.absent(),
+                Value<String?> audio = const Value.absent(),
                 Value<String?> note = const Value.absent(),
               }) => MoodsCompanion.insert(
                 id: id,
                 date: date,
                 emoji: emoji,
+                image: image,
+                audio: audio,
                 note: note,
               ),
           withReferenceMapper:

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:a_new_day/data/models/mood_model.dart';
 import 'package:a_new_day/features/menu/menu.dart';
 import 'package:a_new_day/features/mood_journal/mood_list/mood_list_state.dart';
@@ -6,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:page_flip/page_flip.dart';
 import '../../../core/utils/tool.dart';
 import '../mood_list/mood_list_controller.dart';
+import '../mood_widget/input_audio.dart';
 
 class MoodHomeScreen extends ConsumerWidget {
   MoodHomeScreen({super.key});
@@ -16,6 +19,7 @@ class MoodHomeScreen extends ConsumerWidget {
     final state = ref.watch(moodListProvider);
     final controller = ref.watch(moodListProvider.notifier);
     MoodModel? mCurrent = controller.getToDay()!.isEmpty ? null : controller.getToDay()!.first;
+    // print(mCurrent.toString());
     return Scaffold(
       appBar: mCurrent == null ? AppBar(
           title: Text(
@@ -69,7 +73,7 @@ class MoodHomeScreen extends ConsumerWidget {
                     ),
                     onPressed: () {Navigator.pushNamedAndRemoveUntil(context, '/mood-add', (router)=>false);},
                     child: const Text(
-                      'Có thể cho mình biết không?',
+                      'Lưu giữ lại ký ức hôm nay chứ?',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -86,6 +90,7 @@ class MoodHomeScreen extends ConsumerWidget {
               children: [
                 _buildFirstPage(mCurrent),
                 ..._buildNotePages(context, mCurrent.note),
+                _buildImageAudio(context, mCurrent.image, mCurrent.audio)
               ],
             ),
         ),
@@ -247,8 +252,9 @@ class MoodHomeScreen extends ConsumerWidget {
 
     final size = MediaQuery.of(context).size;
     const padding = EdgeInsets.all(24);
-    final maxWidth = size.width - padding.horizontal - 40;
-    final maxHeight = size.height - padding.vertical;
+    const margin = EdgeInsets.all(20);
+    final maxWidth = size.width - padding.horizontal - margin.horizontal - 40;
+    final maxHeight = size.height - padding.vertical - margin.vertical;
     final style = const TextStyle(fontSize: 18, height: 1.5);
 
     final pages = splitNoteToPages(
@@ -261,6 +267,7 @@ class MoodHomeScreen extends ConsumerWidget {
     int i = 1;
     return pages.map((pageText) => Container(
       padding: padding,
+      margin: margin,
       decoration: BoxDecoration(
         color: const Color(0xFFFBF6EF),
         border: const Border(
@@ -307,6 +314,44 @@ class MoodHomeScreen extends ConsumerWidget {
       )
     ))
         .toList();
+  }
+
+  Widget _buildImageAudio(BuildContext context, String? image, String? audio) {
+    if (image == null && audio == null) return SizedBox();
+    const padding = EdgeInsets.all(24);
+    const margin = EdgeInsets.all(20);
+    return Container(
+        padding: padding,
+        margin: margin,
+        decoration: BoxDecoration(
+          color: const Color(0xFFFBF6EF),
+          border: const Border(
+            right: BorderSide(color: Color(0xFFD6C6B5), width: 6),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.brown.withValues(alpha: 0.15),
+              offset: const Offset(2, 2),
+              blurRadius: 6,
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            if(image!.isNotEmpty)
+              Image.file(
+                File(image!),
+                fit: BoxFit.cover,
+              ),
+            if(audio!.isNotEmpty)
+              AudioRecorderWidget(
+                initialAudioPath: audio,
+                onAudioSaved: (path) {
+                },
+              ),
+          ],
+        ),
+    );
   }
 
   Widget _buildCoverPage() {

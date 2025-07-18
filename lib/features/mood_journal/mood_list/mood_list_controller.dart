@@ -1,7 +1,11 @@
+import 'dart:io';
+
+import 'package:a_new_day/core/utils/image_utils.dart';
 import 'package:a_new_day/data/database/dao/mood_dao.dart';
 import 'package:a_new_day/data/models/mood_model.dart';
 import 'package:a_new_day/features/mood_journal/mood_list/mood_list_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../../data/database/providers/database_providers.dart';
 
 final moodListProvider = NotifierProvider<MoodListController, MoodListState>(
@@ -43,7 +47,40 @@ class MoodListController extends Notifier<MoodListState>{
     return state.activeItemId == id;
   }
 
+  Future<String?> _confirmAudio(String? currentAudioPath) async {
+    if (currentAudioPath == null) return null;
+
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final savedPath = '${directory.path}/audio_${DateTime.now().millisecondsSinceEpoch}.aac';
+
+      final file = await File(currentAudioPath).copy(savedPath);
+
+      return file.path;
+    } catch (e) {
+      print('Error confirming audio: $e');
+      return null;
+    }
+  }
+
   Future<void> insertMood(MoodModel m) async {
+    if(m.image?.isNotEmpty == true){
+      final ImageUtils imageUtil = ImageUtils();
+      final original = File(m.image!);
+      final saved = await imageUtil.compressAndSaveIcon(original);
+      if(saved!=null){
+        m.image = saved.path;
+      }
+      else{
+        m.image = null;
+      }
+    }
+    if(m.audio != null && m.audio!.isNotEmpty){
+      final path = await _confirmAudio(m.audio);
+      if(path != null){
+        m.audio = path;
+      }
+    }
     await moodDao.insertMood(m);
     await _loadData();
   }

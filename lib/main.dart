@@ -59,7 +59,7 @@ class _MyAppState extends ConsumerState<MyApp> {
               );
           }
       },
-      home: MoodHomeScreen(),
+      home: AddMoodScreen(),
     );
   }
 }
