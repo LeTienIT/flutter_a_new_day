@@ -85,6 +85,57 @@ class MoodListController extends Notifier<MoodListState>{
     await _loadData();
   }
 
+  Future<void> updateMood(MoodModel mLast, MoodModel m) async {
+    final ImageUtils imageUtil = ImageUtils();
+
+    // Xóa ảnh cũ nếu khác với ảnh mới
+    if (mLast.image?.isNotEmpty == true && mLast.image != m.image) {
+      await imageUtil.deleteFile(mLast.image!);
+    }
+
+    // Xóa audio cũ nếu khác
+    if (mLast.audio?.isNotEmpty == true && mLast.audio != m.audio) {
+      await imageUtil.deleteFile(mLast.audio!);
+    }
+
+    // Xử lý ảnh mới
+    if (m.image?.isNotEmpty == true) {
+      final original = File(m.image!);
+      final saved = await imageUtil.compressAndSaveIcon(original);
+      if (saved != null) {
+        m.image = saved.path;
+      } else {
+        m.image = null;
+      }
+    }
+
+    // Xử lý audio mới
+    if (m.audio?.isNotEmpty == true) {
+      final path = await _confirmAudio(m.audio);
+      if (path != null) {
+        m.audio = path;
+      }
+    }
+
+    await moodDao.updateMood(m);
+    await _loadData();
+  }
+
+  Future<void> deleteMood(MoodModel mLast) async{
+    final ImageUtils imageUtil = ImageUtils();
+
+    if (mLast.image?.isNotEmpty == true ) {
+      await imageUtil.deleteFile(mLast.image!);
+    }
+
+    if (mLast.audio?.isNotEmpty == true ) {
+      await imageUtil.deleteFile(mLast.audio!);
+    }
+
+    await moodDao.deleteMood(mLast.id!);
+    await _loadData();
+  }
+
   List<MoodModel>? getToDay(){
     final currentState = state;
     final now = DateTime.now();

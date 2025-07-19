@@ -1,8 +1,14 @@
+import 'dart:async';
 import 'dart:io';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import '../../../core/utils/tool.dart';
 
 class AudioRecorderWidget extends StatefulWidget {
   late String? initialAudioPath;
@@ -27,12 +33,16 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget> {
   bool _isPlaying = false;
   String? _tempAudioPath;
   String? _currentAudioPath;
-
+  Duration _currentPosition = Duration.zero;
+  Duration _totalDuration = Duration.zero;
+  StreamSubscription<PlaybackDisposition>? _playerSub;
+  Duration _recordDuration = Duration.zero;
+  Timer? _recordTimer;
   @override
   void initState() {
     super.initState();
-    _recorder = FlutterSoundRecorder();
-    _player = FlutterSoundPlayer();
+    _recorder = FlutterSoundRecorder(logLevel: Level.off);
+    _player = FlutterSoundPlayer(logLevel: Level.off);
     _initAudio();
     _currentAudioPath = widget.initialAudioPath;
   }
@@ -65,6 +75,12 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget> {
         _isRecording = true;
         _tempAudioPath = path;
         _currentAudioPath = null;
+        _recordDuration = Duration.zero;
+      });
+      _recordTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        setState(() {
+          _recordDuration += const Duration(seconds: 1);
+        });
       });
     } catch (e) {
       print('Error starting recording: $e');
@@ -86,15 +102,24 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget> {
 
   Future<void> _playAudio() async {
     if (_currentAudioPath == null) return;
-
+    await _player.setSubscriptionDuration(const Duration(milliseconds: 200));
     try {
       await _player.startPlayer(
         fromURI: _currentAudioPath!,
         codec: Codec.aacADTS,
         whenFinished: () {
-          setState(() => _isPlaying = false);
+          setState(() {
+            _isPlaying = false;
+            _currentPosition = Duration.zero;
+          });
         },
       );
+      _playerSub = _player.onProgress!.listen((e) {
+        setState(() {
+          _currentPosition = e.position;
+          _totalDuration = e.duration;
+        });
+      });
       setState(() => _isPlaying = true);
     } catch (e) {
       print('Error playing audio: $e');
@@ -103,23 +128,8 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget> {
 
   Future<void> _stopPlaying() async {
     await _player.stopPlayer();
+    _playerSub?.cancel();
     setState(() => _isPlaying = false);
-  }
-
-  Future<void> _confirmAudio() async {
-    if (_currentAudioPath == null) return;
-
-    final directory = await getApplicationDocumentsDirectory();
-    final savedPath = '${directory.path}/audio_${DateTime.now().millisecondsSinceEpoch}.aac';
-
-    await File(_currentAudioPath!).copy(savedPath);
-
-    // Gọi callback trả về đường dẫn file
-    widget.onAudioSaved(savedPath);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Đã lưu bản ghi âm')),
-    );
   }
 
   Future<void> _deleteAudio() async {
@@ -136,6 +146,7 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget> {
 
   @override
   void dispose() {
+    _recordTimer?.cancel();
     _recorder.closeRecorder();
     _player.closePlayer();
     super.dispose();
@@ -152,7 +163,7 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget> {
           children: [
             if (_currentAudioPath == null && widget.initialAudioPath == null && !_isRecording && widget.enableEdit)
               Text(
-                'Muốn nói gì không?',
+                'Âm thanh của trái tim',
                 style: Theme.of(context).textTheme.titleMedium,
               )
             else if ((_currentAudioPath != null || widget.initialAudioPath != null) && !_isRecording)
@@ -161,13 +172,18 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget> {
                 style: Theme.of(context).textTheme.titleMedium,
               )
             else if (_isRecording)
-                const Text(
-                  'Đang ghi âm...',
+                Text(
+                  'Đang ghi âm... ${formatDuration_U(_recordDuration)}',
                   style: TextStyle(color: Colors.red),
                 )
               else
                 const Text('Chưa có bản ghi âm'),
 
+            if (_isPlaying || _currentPosition > Duration.zero)
+              Text(
+                '${formatDuration_U(_currentPosition)} / ${formatDuration_U(_totalDuration)}',
+                style: const TextStyle(fontSize: 14),
+              ),
             const SizedBox(height: 16),
 
             // Nút điều khiển
@@ -175,7 +191,7 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Nút ghi âm/dừng
-                if(!_isPlaying)
+                if(!_isPlaying && widget.enableEdit)
                   IconButton(
                     icon: Icon(_isRecording ? Icons.stop : Icons.mic),
                     color: _isRecording ? Colors.red : Colors.blue,
@@ -210,14 +226,6 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // ElevatedButton(
-                  //   style: ElevatedButton.styleFrom(
-                  //     backgroundColor: Colors.green,
-                  //   ),
-                  //   onPressed: _isRecording ? null : _confirmAudio,
-                  //   child: const Text('Lưu trữ'),
-                  // ),
-                  // const SizedBox(width: 16),
                   TextButton(
                     onPressed: _isRecording ? null : _deleteAudio,
                     child: const Text('Xóa file'),

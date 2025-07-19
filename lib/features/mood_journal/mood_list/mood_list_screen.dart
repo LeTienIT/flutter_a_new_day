@@ -1,6 +1,7 @@
+import 'package:a_new_day/core/utils/show_dialog.dart';
 import 'package:a_new_day/data/models/mood_model.dart';
 import 'package:a_new_day/features/menu/menu.dart';
-import 'package:a_new_day/features/mood_journal/mood_list/mood_item.dart';
+import 'package:a_new_day/features/mood_journal/mood_widget/mood_item.dart';
 import 'package:a_new_day/features/mood_journal/mood_list/mood_list_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
@@ -33,9 +34,25 @@ class MoodListScreen extends ConsumerWidget{
                       controller.isActive(item.id!) ? null : item.id!
                   );
                 },
-                onView: (){},
-                onEdit: (){},
-                onDelete: (){}
+                onView: (){Navigator.pushNamed(context, '/mood-view', arguments: item);},
+                onEdit: (){Navigator.pushNamed(context, '/mood-edit', arguments: item);},
+                onDelete: ()async{
+                  final comfirm = await CustomDialog.showConfirmDialog(
+                      context: context,
+                      title: 'Xác nhận xóa',
+                      message: 'Bạn thật sự muốn xóa đi ngày nhật ký này\n'
+                          'Điều này sẽ xoá tất cả nhưng gì bạn đã tạo về nhật ký này.\n'
+                          'Và bạn sẽ không thể: THÊM LẠI NHẬT KÝ CỦA NGÀY NÀY NỮA - NẾU ĐÓ LÀ QUÁ KHỨ\n\n'
+                          '(Kiến nghị) Nếu có chỗ chưa hợp có thể chỉnh sửa');
+                  if(comfirm) {
+                    controller.deleteMood(item);
+                    await CustomDialog.showMessageDialog(
+                        context: context,
+                        title: 'Thông báo',
+                        message: 'Nhật ký đã được xóa'
+                    );
+                  }
+                }
             );
           },
         ),

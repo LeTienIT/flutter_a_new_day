@@ -1,5 +1,4 @@
 import 'package:a_new_day/data/models/mood_model.dart';
-import 'package:a_new_day/features/mood_journal/mood_detail/mood_edit_screen.dart';
 import 'package:a_new_day/features/mood_journal/mood_list/mood_list_screen.dart';
 import 'package:a_new_day/features/mood_journal/mood_view/mood_view_screen.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +7,7 @@ import 'core/theme/dark_theme.dart';
 import 'core/theme/light_theme.dart';
 import 'features/mood_journal/emoji_repository.dart';
 import 'features/mood_journal/mood_add/mood_add_screen.dart';
+import 'features/mood_journal/mood_edit/mood_edit_screen.dart';
 import 'features/mood_journal/mood_home/mood_home_screen.dart';
 
 void main() async{
@@ -59,7 +59,7 @@ class _MyAppState extends ConsumerState<MyApp> {
               );
           }
       },
-      home: AddMoodScreen(),
+      home: MoodHomeScreen(),
     );
   }
 }

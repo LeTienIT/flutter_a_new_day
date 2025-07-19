@@ -23,7 +23,7 @@ class MoodHomeScreen extends ConsumerWidget {
     return Scaffold(
       appBar: mCurrent == null ? AppBar(
           title: Text(
-            formatVietnameseDate(DateTime.now()),
+            formatVietnameseDate_U(DateTime.now()),
             style: const TextStyle(fontSize: 16),
           ),
         )
@@ -71,7 +71,7 @@ class MoodHomeScreen extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    onPressed: () {Navigator.pushNamedAndRemoveUntil(context, '/mood-add', (router)=>false);},
+                    onPressed: () {Navigator.pushNamed(context, '/mood-add');},
                     child: const Text(
                       'Lưu giữ lại ký ức hôm nay chứ?',
                       style: TextStyle(fontSize: 16),
@@ -202,7 +202,7 @@ class MoodHomeScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                formatVietnameseDate(m.date),
+                formatVietnameseDate_U(m.date),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -257,7 +257,7 @@ class MoodHomeScreen extends ConsumerWidget {
     final maxHeight = size.height - padding.vertical - margin.vertical;
     final style = const TextStyle(fontSize: 18, height: 1.5);
 
-    final pages = splitNoteToPages(
+    final pages = splitNoteToPages_U(
       note: note,
       maxWidth: maxWidth,
       maxHeight: maxHeight,
@@ -336,20 +336,30 @@ class MoodHomeScreen extends ConsumerWidget {
             ),
           ],
         ),
-        child: Column(
-          children: [
-            if(image!.isNotEmpty)
-              Image.file(
-                File(image!),
-                fit: BoxFit.cover,
-              ),
-            if(audio!.isNotEmpty)
-              AudioRecorderWidget(
-                initialAudioPath: audio,
-                onAudioSaved: (path) {
-                },
-              ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (image?.isNotEmpty == true)...[
+                Text('Bức ảnh đẹp nhất ngày đó'),
+                SizedBox(height: 20,),
+                Image.file(
+                  File(image!),
+                  fit: BoxFit.cover,
+                ),
+                SizedBox(height: 20,),
+              ],
+              if (audio?.isNotEmpty == true)...[
+                Text('Âm thanh của bạn'),
+                SizedBox(height: 10,),
+                AudioRecorderWidget(
+                  initialAudioPath: audio,
+                  onAudioSaved: (path) {},
+                  enableEdit: false,
+                ),
+              ]
+            ],
+          ),
         ),
     );
   }
@@ -403,7 +413,7 @@ class MoodHomeScreen extends ConsumerWidget {
           ),
           Center(
             child: Text(
-              'I LOVE YOU <3000',
+              '<3 NHẬT KÝ CỦA TRÁI TIM S2',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 32,

@@ -18,9 +18,9 @@ extension MoodModelMapper on MoodModel{
       id: id == null ? const Value.absent() : Value(id!),
       date: Value(date),
       emoji: Value(emoji),
-      image: image == null ? const Value.absent() : Value(image!),
-      audio: audio == null ? const Value.absent() : Value(audio!),
-      note: note == null ? const Value.absent() : Value(note!),
+      image:  Value(image),
+      audio:  Value(audio),
+      note:  Value(note),
     );
   }
 }

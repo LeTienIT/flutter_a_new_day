@@ -47,7 +47,7 @@ class _MoodItem extends State<MoodItem>{
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    formatVietnameseDate(widget.mood.date), // "Thứ Hai, 15 Tháng 7 2023"
+                    formatVietnameseDate_U(widget.mood.date), // "Thứ Hai, 15 Tháng 7 2023"
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                   const SizedBox(height: 12),
@@ -105,13 +105,13 @@ class _MoodItem extends State<MoodItem>{
                     ),
                     const SizedBox(width: 8),
                     TextButton.icon(
-                      onPressed: widget.onView,
+                      onPressed: widget.onEdit,
                       icon: const Icon(Icons.edit, size: 18),
                       label: const Text('Sửa'),
                     ),
                     const SizedBox(width: 8),
                     TextButton.icon(
-                      onPressed: widget.onDelete,
+                      onPressed: widget.onView,
                       icon: const Icon(Icons.remove_red_eye, size: 18, color: Colors.green),
                       label: const Text('Xem', style: TextStyle(color: Colors.green)),
                     ),
