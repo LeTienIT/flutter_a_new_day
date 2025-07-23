@@ -23,7 +23,7 @@ class MoodHomeScreen extends ConsumerWidget {
     return Scaffold(
       appBar: mCurrent == null ? AppBar(
           title: Text(
-            formatVietnameseDate_U(DateTime.now()),
+            formatVietnameseDate(DateTime.now()),
             style: const TextStyle(fontSize: 16),
           ),
         )
@@ -90,7 +90,8 @@ class MoodHomeScreen extends ConsumerWidget {
               children: [
                 _buildFirstPage(mCurrent),
                 ..._buildNotePages(context, mCurrent.note),
-                _buildImageAudio(context, mCurrent.image, mCurrent.audio)
+                if(mCurrent.image?.isNotEmpty == true || mCurrent.audio?.isNotEmpty == true)
+                  _buildImageAudio(context, mCurrent.image, mCurrent.audio)
               ],
             ),
         ),
@@ -202,7 +203,7 @@ class MoodHomeScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                formatVietnameseDate_U(m.date),
+                formatVietnameseDate(m.date),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -257,14 +258,13 @@ class MoodHomeScreen extends ConsumerWidget {
     final maxHeight = size.height - padding.vertical - margin.vertical;
     final style = const TextStyle(fontSize: 18, height: 1.5);
 
-    final pages = splitNoteToPages_U(
+    final pages = splitNoteToPages(
       note: note,
       maxWidth: maxWidth,
       maxHeight: maxHeight,
       style: style,
     );
 
-    int i = 1;
     return pages.map((pageText) => Container(
       padding: padding,
       margin: margin,
@@ -293,21 +293,9 @@ class MoodHomeScreen extends ConsumerWidget {
               bottom: 0,
               child: Image.asset(
                 'assets/emoji_default/arrow.png',
-                width: 80,
+                width: 30,
                 height: 20,
                 fit: BoxFit.fill,
-              ),
-            ),
-            Positioned(
-              bottom: 0, 
-              left: 0,
-              right: 0,
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child: Text('${i++}'),
-                ),
               ),
             ),
           ]
@@ -358,6 +346,7 @@ class MoodHomeScreen extends ConsumerWidget {
                   enableEdit: false,
                 ),
               ]
+
             ],
           ),
         ),

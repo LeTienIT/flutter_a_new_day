@@ -173,7 +173,7 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget> {
               )
             else if (_isRecording)
                 Text(
-                  'Đang ghi âm... ${formatDuration_U(_recordDuration)}',
+                  'Đang ghi âm... ${formatDuration(_recordDuration)}',
                   style: TextStyle(color: Colors.red),
                 )
               else
@@ -181,7 +181,7 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget> {
 
             if (_isPlaying || _currentPosition > Duration.zero)
               Text(
-                '${formatDuration_U(_currentPosition)} / ${formatDuration_U(_totalDuration)}',
+                '${formatDuration(_currentPosition)} / ${formatDuration(_totalDuration)}',
                 style: const TextStyle(fontSize: 14),
               ),
             const SizedBox(height: 16),

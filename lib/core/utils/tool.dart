@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
-String formatVietnameseDate_U(DateTime date) {
+String formatVietnameseDate(DateTime date) {
   const weekdays = {
     1: 'Thứ Hai',
     2: 'Thứ Ba',
@@ -22,12 +22,12 @@ String formatVietnameseDate_U(DateTime date) {
   return '$weekdayName, ngày $day tháng $month NĂM $year';
 }
 
-String formatDuration_U(Duration d) {
+String formatDuration(Duration d) {
   String two(int n) => n.toString().padLeft(2, '0');
   return '${two(d.inMinutes.remainder(60))}:${two(d.inSeconds.remainder(60))}';
 }
 
-List<String> splitNoteToPages_U({required String note, required double maxWidth, required double maxHeight, required TextStyle style,}) {
+List<String> splitNoteToPages({required String note, required double maxWidth, required double maxHeight, required TextStyle style,}) {
   final words = note.split(RegExp(r'\s+'));
   final pages = <String>[];
   String current = '';

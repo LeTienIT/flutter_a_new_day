@@ -32,13 +32,13 @@ class _IconInput extends State<IconInput>{
     final file = await _imageUtil.pickImageFromGallery();
     if (file == null) return;
 
-    final isValid = await _imageUtil.isValidIcon(file);
-    if (!isValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ảnh không phù hợp làm icon. Vui lòng chọn ảnh khác')),
-      );
-      return;
-    }
+    // final isValid = await _imageUtil.isValidIcon(file);
+    // if (!isValid) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('Ảnh không phù hợp làm icon. Vui lòng chọn ảnh khác')),
+    //   );
+    //   return;
+    // }
 
     setState(() {
       _iconFile = file;

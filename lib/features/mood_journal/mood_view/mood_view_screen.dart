@@ -108,7 +108,7 @@ class MoodViewScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 30),
               Text(
-                formatVietnameseDate_U(m.date),
+                formatVietnameseDate(m.date),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -157,20 +157,19 @@ class MoodViewScreen extends ConsumerWidget {
     if (note == null || note.trim().isEmpty) return [];
 
     final size = MediaQuery.of(context).size;
-    const padding = EdgeInsets.all(24);
-    const margin = EdgeInsets.all(20);
-    final maxWidth = size.width - padding.horizontal - margin.horizontal - 40;
+    const padding = EdgeInsets.all(18);
+    const margin = EdgeInsets.all(16);
+    final maxWidth = size.width - padding.horizontal - margin.horizontal - 80;
     final maxHeight = size.height - padding.vertical - margin.vertical;
-    final style = const TextStyle(fontSize: 18, height: 1.5);
+    final style = const TextStyle(fontSize: 18, height: 1.2);
 
-    final pages = splitNoteToPages_U(
+    final pages = splitNoteToPages(
       note: note,
       maxWidth: maxWidth,
       maxHeight: maxHeight,
       style: style,
     );
 
-    int i = 1;
     return pages.map((pageText) => Container(
         padding: padding,
         margin: margin,
@@ -199,21 +198,9 @@ class MoodViewScreen extends ConsumerWidget {
                 bottom: 0,
                 child: Image.asset(
                   'assets/emoji_default/arrow.png',
-                  width: 80,
+                  width: 30,
                   height: 20,
                   fit: BoxFit.fill,
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: Text('${i++}'),
-                  ),
                 ),
               ),
             ]

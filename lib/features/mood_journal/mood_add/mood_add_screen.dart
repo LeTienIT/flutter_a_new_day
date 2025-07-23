@@ -49,7 +49,7 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  formatVietnameseDate_U(DateTime.now()),
+                  formatVietnameseDate(DateTime.now()),
                   style: const TextStyle(fontSize: 16,fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),

@@ -47,7 +47,7 @@ class _MoodItem extends State<MoodItem>{
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    formatVietnameseDate_U(widget.mood.date), // "Thứ Hai, 15 Tháng 7 2023"
+                    formatVietnameseDate(widget.mood.date), // "Thứ Hai, 15 Tháng 7 2023"
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                   const SizedBox(height: 12),

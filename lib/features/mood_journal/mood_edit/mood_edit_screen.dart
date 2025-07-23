@@ -61,7 +61,7 @@ class _MoodEditScreenState extends ConsumerState<MoodEditScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  formatVietnameseDate_U(widget.mood.date),
+                  formatVietnameseDate(widget.mood.date),
                   style: const TextStyle(fontSize: 16,fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
