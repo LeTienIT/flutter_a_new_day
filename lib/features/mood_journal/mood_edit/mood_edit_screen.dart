@@ -152,7 +152,7 @@ class _MoodEditScreenState extends ConsumerState<MoodEditScreen> {
                     onPressed: selectedEmojiPath == null || slogan.isEmpty ? null : () async {
                       final newMood = MoodModel(
                         id: widget.mood.id,
-                        date: DateTime.now(),
+                        date: widget.mood.date,
                         emoji: '$selectedEmojiPath|$slogan',
                         note: _noteController.text.isEmpty ? null : _noteController.text,
                         image: iconPath ?? null,
