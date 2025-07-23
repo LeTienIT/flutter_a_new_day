@@ -9,6 +9,7 @@ import '../emoji_repository.dart';
 import '../mood_list/mood_list_controller.dart';
 import '../mood_widget/input_audio.dart';
 import '../mood_widget/pick_image.dart';
+import '../mood_widget/video_input.dart';
 
 class AddMoodScreen extends ConsumerStatefulWidget {
   const AddMoodScreen({super.key});
@@ -24,7 +25,7 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
   final _sloganController = TextEditingController();
   final _noteController = TextEditingController();
 
-  String? iconPath , _savedAudioPath ;
+  String? iconPath , _savedAudioPath, videoPath ;
 
 
   @override
@@ -118,6 +119,15 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
                     }
                   },
                 ),
+                const SizedBox(height: 30),
+
+                VideoInput(
+                    initialVideoPath: videoPath,
+                    onVideoPicked: (path){
+                      if(path!=null){
+                        videoPath = path;
+                      }
+                }),
 
                 const SizedBox(height: 30),
 
@@ -142,6 +152,7 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
                         note: note.isEmpty ? null : note,
                         image: iconPath ?? null,
                         audio: _savedAudioPath ?? null,
+                        video: videoPath ?? null,
                       );
                       // print(newMood.toString());
                       await ref.read(moodListProvider.notifier).insertMood(newMood);

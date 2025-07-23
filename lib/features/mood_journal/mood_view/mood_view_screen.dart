@@ -9,6 +9,7 @@ import 'package:page_flip/page_flip.dart';
 import '../../../core/utils/tool.dart';
 import '../mood_list/mood_list_controller.dart';
 import '../mood_widget/input_audio.dart';
+import '../mood_widget/video_input.dart';
 
 class MoodViewScreen extends ConsumerWidget {
   MoodModel mood;
@@ -35,8 +36,8 @@ class MoodViewScreen extends ConsumerWidget {
           children: [
             _buildFirstPage(mCurrent),
             ..._buildNotePages(context, mCurrent.note),
-            _buildImageAudio(context, mCurrent.image, mCurrent.audio),
-
+            if(mCurrent.image?.isNotEmpty == true || mCurrent.audio?.isNotEmpty == true || mCurrent.video?.isNotEmpty == true)
+              _buildImageAudio(context, mCurrent.image, mCurrent.audio, mCurrent.video),
           ],
         ),
       ),
@@ -209,7 +210,7 @@ class MoodViewScreen extends ConsumerWidget {
         .toList();
   }
 
-  Widget _buildImageAudio(BuildContext context, String? image, String? audio) {
+  Widget _buildImageAudio(BuildContext context, String? image, String? audio, String? video) {
     if (image == null && audio == null) return SizedBox();
     const padding = EdgeInsets.all(24);
     const margin = EdgeInsets.all(20);
@@ -239,6 +240,16 @@ class MoodViewScreen extends ConsumerWidget {
               Image.file(
                 File(image!),
                 fit: BoxFit.cover,
+              ),
+              SizedBox(height: 20,),
+            ],
+            if (video?.isNotEmpty == true)...[
+              Text('Khoảnh khắc kỷ niệm'),
+              SizedBox(height: 10,),
+              VideoInput(
+                initialVideoPath: video,
+                onVideoPicked: (path){},
+                enableEdit: false,
               ),
               SizedBox(height: 20,),
             ],

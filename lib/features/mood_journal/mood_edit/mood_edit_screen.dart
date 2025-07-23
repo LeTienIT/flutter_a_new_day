@@ -1,4 +1,5 @@
 import 'package:a_new_day/data/database/providers/database_providers.dart';
+import 'package:a_new_day/features/mood_journal/mood_widget/video_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -24,7 +25,7 @@ class _MoodEditScreenState extends ConsumerState<MoodEditScreen> {
   late TextEditingController _sloganController;
   late TextEditingController _noteController;
 
-  String? iconPath , _savedAudioPath ;
+  String? iconPath , _savedAudioPath, videoPath ;
 
   @override
   void initState() {
@@ -36,7 +37,8 @@ class _MoodEditScreenState extends ConsumerState<MoodEditScreen> {
     selectedEmojiPath = imagePath;
     iconPath = widget.mood.image;
     _savedAudioPath = widget.mood.audio;
-    // print(("load edit: ${widget.mood.toString()}"));
+    videoPath = widget.mood.video;
+    print(("load edit: ${widget.mood.toString()}"));
     super.initState();
   }
   @override
@@ -122,11 +124,16 @@ class _MoodEditScreenState extends ConsumerState<MoodEditScreen> {
                 IconInput(
                   initialIconPath: iconPath,
                   onIconPicked: (path) {
-                    if(path!=null){
-                      iconPath = path;
-                    }
+                    iconPath = path;
                   },
                 ),
+                const SizedBox(height: 30),
+
+                VideoInput(
+                  initialVideoPath: videoPath,
+                  onVideoPicked: (path){
+                    videoPath = path;
+                }),
 
                 const SizedBox(height: 30),
 
@@ -150,6 +157,7 @@ class _MoodEditScreenState extends ConsumerState<MoodEditScreen> {
                         note: _noteController.text.isEmpty ? null : _noteController.text,
                         image: iconPath ?? null,
                         audio: _savedAudioPath ?? null,
+                        video: videoPath ?? null,
                       );
                       // print('mood: ${widget.mood.toString()}\nnew: ${newMood.toString()}');
                       await ref.read(moodListProvider.notifier).updateMood(widget.mood, newMood);

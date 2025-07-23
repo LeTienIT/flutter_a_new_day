@@ -6,6 +6,7 @@ class Moods extends Table {
   TextColumn get emoji => text()(); // lưu emoji
   TextColumn get image => text().nullable()();
   TextColumn get audio => text().nullable()();
+  TextColumn get video => text().nullable()();
   TextColumn get note => text().nullable()();
 
   @override

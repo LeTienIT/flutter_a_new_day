@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:a_new_day/core/utils/image_utils.dart';
+import 'package:a_new_day/core/utils/video_utils.dart';
 import 'package:a_new_day/data/database/dao/mood_dao.dart';
 import 'package:a_new_day/data/models/mood_model.dart';
 import 'package:a_new_day/features/mood_journal/mood_list/mood_list_state.dart';
@@ -75,22 +76,41 @@ class MoodListController extends Notifier<MoodListState>{
         m.image = null;
       }
     }
+
+    if (m.video?.isNotEmpty == true) {
+      final VideoUtils videoUtil = VideoUtils();
+      final original = File(m.video!);
+      final saved = await videoUtil.saveVideo(original);
+      if (saved != null) {
+        m.video = saved.path;
+      } else {
+        m.video = null;
+      }
+    }
+
     if(m.audio != null && m.audio!.isNotEmpty){
       final path = await _confirmAudio(m.audio);
       if(path != null){
         m.audio = path;
       }
     }
+
     await moodDao.insertMood(m);
     await _loadData();
   }
 
   Future<void> updateMood(MoodModel mLast, MoodModel m) async {
     final ImageUtils imageUtil = ImageUtils();
+    final VideoUtils videoUtil = VideoUtils();
 
     // Xóa ảnh cũ nếu khác với ảnh mới
     if (mLast.image?.isNotEmpty == true && mLast.image != m.image) {
       await imageUtil.deleteFile(mLast.image!);
+    }
+
+    // Xóa video cũ nếu khác
+    if (mLast.video?.isNotEmpty == true && mLast.video != m.video) {
+      await videoUtil.deleteVideo(mLast.video!);
     }
 
     // Xóa audio cũ nếu khác
@@ -109,6 +129,16 @@ class MoodListController extends Notifier<MoodListState>{
       }
     }
 
+    if (m.video?.isNotEmpty == true) {
+      final original = File(m.video!);
+      final saved = await videoUtil.saveVideo(original);
+      if (saved != null) {
+        m.video = saved.path;
+      } else {
+        m.video = null;
+      }
+    }
+
     // Xử lý audio mới
     if (m.audio?.isNotEmpty == true) {
       final path = await _confirmAudio(m.audio);
@@ -123,9 +153,14 @@ class MoodListController extends Notifier<MoodListState>{
 
   Future<void> deleteMood(MoodModel mLast) async{
     final ImageUtils imageUtil = ImageUtils();
+    final VideoUtils videoUtil = VideoUtils();
 
     if (mLast.image?.isNotEmpty == true ) {
       await imageUtil.deleteFile(mLast.image!);
+    }
+
+    if (mLast.video?.isNotEmpty == true ) {
+      await videoUtil.deleteVideo(mLast.video!);
     }
 
     if (mLast.audio?.isNotEmpty == true ) {

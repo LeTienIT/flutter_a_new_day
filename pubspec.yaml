@@ -24,6 +24,8 @@ dependencies:
   flutter_speed_dial: ^7.0.0
   fl_chart: ^1.0.0
   image_picker: ^1.0.0
+  video_player: ^2.7.0
+  chewie: ^1.7.4
   flutter_image_compress: ^2.1.0
   image: ^4.0.17
   numberpicker: ^2.1.1

@@ -22,7 +22,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnect());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -47,6 +47,9 @@ class AppDatabase extends _$AppDatabase {
       });
     },
     onUpgrade: (m, from, to) async {
+      if (from == 1) {
+        await m.addColumn(moods, moods.video);
+      }
     },
   );
 

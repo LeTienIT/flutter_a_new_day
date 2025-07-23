@@ -133,9 +133,9 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget> {
   }
 
   Future<void> _deleteAudio() async {
-    if (_currentAudioPath != null && await File(_currentAudioPath!).exists()) {
-      await File(_currentAudioPath!).delete();
-    }
+    // if (_currentAudioPath != null && await File(_currentAudioPath!).exists()) {
+    //   await File(_currentAudioPath!).delete();
+    // }
 
     setState(() {
       _currentAudioPath = null;

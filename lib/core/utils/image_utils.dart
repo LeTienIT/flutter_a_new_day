@@ -46,7 +46,7 @@ class ImageUtils {
     final dir = await getApplicationDocumentsDirectory();
     final targetPath = p.join(
       dir.path,
-      fileName ?? 'icon_${DateTime.now().millisecondsSinceEpoch}.jpg',
+      fileName ?? 'image_${DateTime.now().millisecondsSinceEpoch}.jpg',
     );
 
     final result = await FlutterImageCompress.compressAndGetFile(

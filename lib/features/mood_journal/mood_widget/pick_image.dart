@@ -32,14 +32,6 @@ class _IconInput extends State<IconInput>{
     final file = await _imageUtil.pickImageFromGallery();
     if (file == null) return;
 
-    // final isValid = await _imageUtil.isValidIcon(file);
-    // if (!isValid) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text('Ảnh không phù hợp làm icon. Vui lòng chọn ảnh khác')),
-    //   );
-    //   return;
-    // }
-
     setState(() {
       _iconFile = file;
     });
@@ -47,26 +39,42 @@ class _IconInput extends State<IconInput>{
     widget.onIconPicked(file.path);
   }
 
+  Future<void> _deleteVideo() async {
+    setState(() {
+      _iconFile = null;
+    });
+    widget.onIconPicked(null);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 20,
-      alignment: WrapAlignment.center,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      runSpacing: 10,
-      children: [
-        _iconFile != null
-            ? Image.file(
-          _iconFile!,
-          fit: BoxFit.cover,
-        )
-            : Icon(Icons.photo),
-        ElevatedButton.icon(
-          onPressed: _pickIcon,
-          icon: const Icon(Icons.image),
-          label: const Text('Tấm ảnh đẹp nhất hôm nay'),
-        ),
-      ],
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _iconFile != null
+              ? Image.file(
+            _iconFile!,
+            fit: BoxFit.cover,
+            width: 200, // Bạn có thể thêm width cố định nếu cần
+          )
+              : const Icon(Icons.photo, size: 50),
+          const SizedBox(height: 10),
+          ElevatedButton.icon(
+            onPressed: _pickIcon,
+            icon: const Icon(Icons.image),
+            label: const Text('Tấm ảnh đẹp nhất hôm nay'),
+          ),
+          SizedBox(height: 10,),
+          if(_iconFile!=null)
+            ElevatedButton.icon(
+              onPressed: _iconFile!=null ? _deleteVideo : null,
+              icon: const Icon(Icons.delete),
+              label: const Text('Xóa ảnh hiện tại'),
+            ),
+        ],
+      ),
     );
   }
 }
