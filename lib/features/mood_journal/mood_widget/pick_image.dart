@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 
 import '../../../core/utils/image_utils.dart';
 
-class IconInput extends StatefulWidget{
+class ImageInput extends StatefulWidget{
   final void Function(String? path) onIconPicked;
   final String? initialIconPath;
 
-  const IconInput({super.key, required this.onIconPicked, this.initialIconPath,});
+  const ImageInput({super.key, required this.onIconPicked, this.initialIconPath,});
 
   @override
   State<StatefulWidget> createState() {
-    return _IconInput();
+    return _ImageInput();
   }
 
 }
 
-class _IconInput extends State<IconInput>{
+class _ImageInput extends State<ImageInput>{
   File? _iconFile;
   final ImageUtils _imageUtil = ImageUtils();
 

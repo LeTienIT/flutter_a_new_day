@@ -38,7 +38,7 @@ class _MoodEditScreenState extends ConsumerState<MoodEditScreen> {
     iconPath = widget.mood.image;
     _savedAudioPath = widget.mood.audio;
     videoPath = widget.mood.video;
-    print(("load edit: ${widget.mood.toString()}"));
+    // print(("load edit: ${widget.mood.toString()}"));
     super.initState();
   }
   @override
@@ -121,7 +121,7 @@ class _MoodEditScreenState extends ConsumerState<MoodEditScreen> {
 
                 const SizedBox(height: 30),
 
-                IconInput(
+                ImageInput(
                   initialIconPath: iconPath,
                   onIconPicked: (path) {
                     iconPath = path;

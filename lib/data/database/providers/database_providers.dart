@@ -20,6 +20,6 @@ final habitDaoProvider = Provider<HabitDAO>((ref) {
 });
 
 // Các DAO khác nếu có
-final EmojiDaoProvider = Provider<EmojiDAO>((ref) {
+final emojiDaoProvider = Provider<EmojiDAO>((ref) {
   return ref.watch(appDatabaseProvider).emojiDao;
 });

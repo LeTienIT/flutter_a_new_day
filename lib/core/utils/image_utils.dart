@@ -42,17 +42,36 @@ class ImageUtils {
     }
   }
 
-  Future<File?> compressAndSaveIcon(File image, {String? fileName}) async {
+  Future<File?> compressAndSaveImage(File image, {String? fileName, String type = 'image'}) async {
     final dir = await getApplicationDocumentsDirectory();
     final targetPath = p.join(
       dir.path,
-      fileName ?? 'image_${DateTime.now().millisecondsSinceEpoch}.jpg',
+      fileName ?? '${type}_${DateTime.now().millisecondsSinceEpoch}.jpg',
     );
 
     final result = await FlutterImageCompress.compressAndGetFile(
       image.absolute.path,
       targetPath,
       quality: 100,
+      format: CompressFormat.jpeg,
+    );
+
+    return result != null ? File(result.path) : null;
+  }
+
+  Future<File?> compressAndSaveIcon(File image, {String? fileName}) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final targetPath = p.join(
+      dir.path,
+      fileName ?? 'icon_${DateTime.now().millisecondsSinceEpoch}.jpg',
+    );
+
+    final result = await FlutterImageCompress.compressAndGetFile(
+      image.absolute.path,
+      targetPath,
+      quality: 75,
+      minWidth: 96,
+      minHeight: 96,
       format: CompressFormat.jpeg,
     );
 

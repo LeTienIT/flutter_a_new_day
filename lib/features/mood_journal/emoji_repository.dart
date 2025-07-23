@@ -4,7 +4,7 @@ import 'package:a_new_day/data/models/emoji_model.dart';
 import 'package:a_new_day/data/database/providers/database_providers.dart'; // để lấy appDatabaseProvider
 
 final emojiRepositoryProvider = Provider<EmojiRepository>((ref) {
-  final emojiDao = ref.read(EmojiDaoProvider); // dùng dao đã khai báo
+  final emojiDao = ref.read(emojiDaoProvider); // dùng dao đã khai báo
   return EmojiRepository(emojiDao);
 });
 

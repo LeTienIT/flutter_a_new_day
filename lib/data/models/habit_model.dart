@@ -14,4 +14,9 @@ class HabitModel{
       this.color,
       required this.createdAt
   });
+
+  @override
+  String toString() {
+    return 'HbitModel{id: $id, date: ${repeatDays.toString()}, icon: $icon, createdAt: $createdAt';
+  }
 }

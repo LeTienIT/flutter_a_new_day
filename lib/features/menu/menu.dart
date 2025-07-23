@@ -23,19 +23,42 @@ class Menu extends StatelessWidget{
           child: ListView(
             children: [
               ExpansionTile(
-                leading: Icon(Icons.monetization_on),
+                leading: Icon(Icons.checklist_rtl_outlined),
+                title: const Text('Thói quen mỗi ngày'),
+                childrenPadding: EdgeInsets.only(left: 16),
+                initiallyExpanded: true,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.list),
+                    title: const Text('Hôm nay'),
+                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-home', (route) => false),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.list),
+                    title: const Text('Danh sách thói quen'),
+                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-list', (route) => false),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.home),
+                    title: const Text('Thêm thói quen'),
+                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-add', (router) => false),
+                  ),
+                ],
+              ),
+              ExpansionTile(
+                leading: Icon(Icons.menu_book_outlined),
                 title: const Text('Nhật ký'),
                 childrenPadding: EdgeInsets.only(left: 16),
                 initiallyExpanded: true,
                 children: [
                   ListTile(
                     leading: Icon(Icons.home),
-                    title: const Text('Hôm nay'),
+                    title: const Text('Nhật ký hôm nay'),
                     onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/mood-home', (router) => false),
                   ),
                   ListTile(
                     leading: const Icon(Icons.list),
-                    title: const Text('Danh sách'),
+                    title: const Text('Danh sách nhật ký'),
                     onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/mood-list', (route) => false),
                   ),
                 ],

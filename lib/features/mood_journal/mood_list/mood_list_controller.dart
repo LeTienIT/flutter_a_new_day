@@ -68,7 +68,7 @@ class MoodListController extends Notifier<MoodListState>{
     if(m.image?.isNotEmpty == true){
       final ImageUtils imageUtil = ImageUtils();
       final original = File(m.image!);
-      final saved = await imageUtil.compressAndSaveIcon(original);
+      final saved = await imageUtil.compressAndSaveImage(original);
       if(saved!=null){
         m.image = saved.path;
       }
@@ -104,45 +104,39 @@ class MoodListController extends Notifier<MoodListState>{
     final VideoUtils videoUtil = VideoUtils();
 
     // Xóa ảnh cũ nếu khác với ảnh mới
-    if (mLast.image?.isNotEmpty == true && mLast.image != m.image) {
-      await imageUtil.deleteFile(mLast.image!);
+    if (mLast.image != m.image) {
+      if (mLast.image?.isNotEmpty == true) {
+        await imageUtil.deleteFile(mLast.image!);
+      }
+
+      if (m.image?.isNotEmpty == true) {
+        final original = File(m.image!);
+        final saved = await imageUtil.compressAndSaveImage(original);
+        m.image = saved?.path;
+      }
     }
 
     // Xóa video cũ nếu khác
-    if (mLast.video?.isNotEmpty == true && mLast.video != m.video) {
-      await videoUtil.deleteVideo(mLast.video!);
+    if (mLast.video != m.video) {
+      if (mLast.video?.isNotEmpty == true) {
+        await videoUtil.deleteVideo(mLast.video!);
+      }
+
+      if (m.video?.isNotEmpty == true) {
+        final original = File(m.video!);
+        final saved = await videoUtil.saveVideo(original);
+        m.video = saved?.path ?? null;
+      }
     }
 
     // Xóa audio cũ nếu khác
-    if (mLast.audio?.isNotEmpty == true && mLast.audio != m.audio) {
-      await imageUtil.deleteFile(mLast.audio!);
-    }
-
-    // Xử lý ảnh mới
-    if (m.image?.isNotEmpty == true) {
-      final original = File(m.image!);
-      final saved = await imageUtil.compressAndSaveIcon(original);
-      if (saved != null) {
-        m.image = saved.path;
-      } else {
-        m.image = null;
+    if (mLast.audio != m.audio) {
+      if (mLast.audio?.isNotEmpty == true) {
+        await imageUtil.deleteFile(mLast.audio!); // hoặc audioUtil nếu bạn có
       }
-    }
 
-    if (m.video?.isNotEmpty == true) {
-      final original = File(m.video!);
-      final saved = await videoUtil.saveVideo(original);
-      if (saved != null) {
-        m.video = saved.path;
-      } else {
-        m.video = null;
-      }
-    }
-
-    // Xử lý audio mới
-    if (m.audio?.isNotEmpty == true) {
-      final path = await _confirmAudio(m.audio);
-      if (path != null) {
+      if (m.audio?.isNotEmpty == true) {
+        final path = await _confirmAudio(m.audio);
         m.audio = path;
       }
     }

@@ -110,7 +110,7 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
 
                 const SizedBox(height: 30),
 
-                IconInput(
+                ImageInput(
                   initialIconPath: '',
                   onIconPicked: (path) {
                     if(path!=null){

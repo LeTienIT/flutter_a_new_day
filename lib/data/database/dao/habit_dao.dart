@@ -35,6 +35,17 @@ class HabitDAO extends DatabaseAccessor<AppDatabase> with _$HabitDAOMixin{
     return data.map((d)=>d.toModel()).toList();
   }
 
+  Future<bool> isExist(int habitId, DateTime date) async {
+    final query = await (select(habitStatus)
+      ..where((tbl) =>
+      tbl.habitId.equals(habitId) &
+      tbl.date.equals(DateTime(date.year, date.month, date.day))
+      )
+    ).getSingleOrNull();
+
+    return query != null;
+  }
+
   Future<int> insertHabitStatus(HabitStatusModel h) async{
     return await into(habitStatus).insert(h.toCompanion());
   }
@@ -47,4 +58,5 @@ class HabitDAO extends DatabaseAccessor<AppDatabase> with _$HabitDAOMixin{
     final query = delete(habitStatus)..where((h) => h.id.equals(id));
     return await query.go();
   }
+
 }
