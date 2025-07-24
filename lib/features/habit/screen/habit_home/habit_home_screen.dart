@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:a_new_day/data/models/habit_status_model.dart';
 import 'package:a_new_day/features/habit/provider/today_habit_status_controller.dart';
 import 'package:a_new_day/features/menu/menu.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../data/database/providers/database_providers.dart';
@@ -50,8 +51,11 @@ class _HomeHabitScreen extends ConsumerState<HomeHabitScreen>{
             itemCount: statuses.length,
             itemBuilder: (context, index) {
               final status = statuses[index];
-              final habit = habits.firstWhere((h) => h.id == status.habitId);
-              String? iconPath = habit.icon;
+              final habit = habits.firstWhereOrNull((h) => h.id == status.habitId);
+              String? iconPath;
+              if(habit != null){
+                iconPath = habit.icon?.isNotEmpty == true ? habit.icon : null;
+              }
               return Container(
                 padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -80,12 +84,49 @@ class _HomeHabitScreen extends ConsumerState<HomeHabitScreen>{
                           : null,
                     ),
                     const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        habit.name,
-                        style: Theme.of(context).textTheme.titleMedium,
+                    if(habit==null)...[
+                      Expanded(
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(text: status.habitTitle),
+                              TextSpan(
+                                text: "\n(Đã bị xóa)",
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ]
+                    else if(habit != null && habit.name != status.habitTitle)...[
+                      Expanded(
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(text: status.habitTitle),
+                              TextSpan(
+                                text: "\n(Đổi tên: ${habit.name})",
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ]
+                    else
+                      Expanded(
+                        child: Text(
+                          habit.name,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
                       ),
-                    ),
                     Checkbox(
                       value: status.completed,
                       onChanged: (value) async {

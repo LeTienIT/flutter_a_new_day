@@ -58,6 +58,20 @@ class HabitDAO extends DatabaseAccessor<AppDatabase> with _$HabitDAOMixin{
   //   return rs.map((d)=>d.toModel()).toList();
   // }
 
+  Future<HabitStatusModel?> getHabitStatus(int habitId, DateTime date) async {
+    final start = DateTime(date.year, date.month, date.day);
+    final end = start.add(const Duration(days: 1));
+
+    final rs = await (select(habitStatus)
+      ..where((tbl) =>
+      tbl.habitId.equals(habitId) &
+      tbl.date.isBetweenValues(start, end)
+      )
+    ).getSingleOrNull();
+
+    return rs?.toModel();
+  }
+
   Future<void> generateTodayStatuses() async {
     final today = DateTime.now();
     final todayDate = DateTime(today.year, today.month, today.day);
@@ -111,5 +125,13 @@ class HabitDAO extends DatabaseAccessor<AppDatabase> with _$HabitDAOMixin{
         .get();
 
     return rs.map((e) => e.toModel()).toList();
+  }
+
+  Future<void> deleteStatusesToday(int habitId, DateTime start, DateTime end) async {
+    await (delete(habitStatus)
+      ..where((tbl) =>
+      tbl.habitId.equals(habitId) &
+      tbl.date.isBetweenValues(start, end))
+    ).go();
   }
 }

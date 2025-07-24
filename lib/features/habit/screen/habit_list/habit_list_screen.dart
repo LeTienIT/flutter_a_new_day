@@ -49,7 +49,7 @@ class HabitListScreen extends ConsumerWidget{
                     await CustomDialog.showMessageDialog(
                         context: context,
                         title: 'Thông báo',
-                        message: 'Nhật ký đã được xóa'
+                        message: 'Thòi quen đã được xóa'
                     );
                   }
                 }

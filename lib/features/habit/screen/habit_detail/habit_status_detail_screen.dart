@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'package:a_new_day/core/utils/tool.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../data/database/providers/database_providers.dart';
+import '../../../../data/models/habit_model.dart';
 import '../../../../data/models/habit_status_model.dart';
 import '../../provider/habit_list_controller.dart';
 import '../../provider/habit_state.dart';
@@ -49,9 +51,11 @@ class HabitStatusDetailScreen extends ConsumerWidget{
                   itemCount: statuses.length,
                   itemBuilder: (context, index) {
                     final status = statuses[index];
-                    final habit =
-                    habits.firstWhere((h) => h.id == status.habitId);
-                    final iconPath = habit.icon;
+                    final habit = habits.firstWhereOrNull((h) => h.id == status.habitId);
+                    String? iconPath;
+                    if(habit != null){
+                      iconPath = habit.icon?.isNotEmpty == true ? habit.icon : null;
+                    }
 
                     return Container(
                       padding: const EdgeInsets.symmetric(
@@ -83,13 +87,49 @@ class HabitStatusDetailScreen extends ConsumerWidget{
                                 : null,
                           ),
                           const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              habit.name,
-                              style:
-                              Theme.of(context).textTheme.titleMedium,
+                          if(habit==null)...[
+                            Expanded(
+                              child: Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(text: status.habitTitle),
+                                    TextSpan(
+                                      text: "\n(Đã bị xóa)",
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          ]
+                          else if(habit != null && habit.name != status.habitTitle)...[
+                            Expanded(
+                              child: Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(text: status.habitTitle),
+                                    TextSpan(
+                                      text: "\n(Đổi tên: ${habit.name})",
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          ]
+                          else
+                            Expanded(
+                              child: Text(
+                                habit.name,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
                             ),
-                          ),
                           Text(
                             status.completed ? '✔️' : '❌',
                             style: const TextStyle(fontSize: 20),

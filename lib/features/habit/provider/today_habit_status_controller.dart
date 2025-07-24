@@ -9,11 +9,11 @@ import 'habit_history_controller.dart';
 import 'habit_list_controller.dart';
 import 'habit_state.dart';
 
-final todayHabitStatusProvider = AsyncNotifierProvider<TodayHabitStatusNotifier, List<HabitStatusModel>>(
+final todayHabitStatusProvider = AutoDisposeAsyncNotifierProvider<TodayHabitStatusNotifier, List<HabitStatusModel>>(
     TodayHabitStatusNotifier.new
 );
 
-class TodayHabitStatusNotifier extends AsyncNotifier<List<HabitStatusModel>> {
+class TodayHabitStatusNotifier extends AutoDisposeAsyncNotifier<List<HabitStatusModel>> {
   late final HabitDAO dao;
 
   @override

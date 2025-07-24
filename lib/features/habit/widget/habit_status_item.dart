@@ -1,15 +1,18 @@
+import 'package:a_new_day/core/utils/show_dialog.dart';
+import 'package:a_new_day/data/database/providers/database_providers.dart';
 import 'package:a_new_day/data/models/habit_status_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/utils/tool.dart';
 
-class HabitStatusItem extends StatelessWidget{
+class HabitStatusItem extends ConsumerWidget{
   final HabitStatusModel h;
   const HabitStatusItem({super.key, required this.h});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     String trangThai = h.completed ? 'Hoàn thành' : 'Chưa hoàn thành';
 
     return Container(
@@ -45,16 +48,41 @@ class HabitStatusItem extends StatelessWidget{
             ],
           ),
           // Nút xem chi tiết bên phải
-          IconButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
-            ),
-            onPressed: () {
-              Navigator.pushNamed(context, 'habit-status-detail',arguments: h.date);
-            },
-            icon: const Icon(Icons.remove_red_eye),
-          ),
+          Wrap(
+            children: [
+              IconButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                ),
+                onPressed: () async{
+                  final mood = await ref.read(moodDaoProvider).getMoodByDate(h.date);
+                  if(mood != null){
+                    Navigator.pushNamed(context, 'mood-view',arguments: mood);
+                  }
+                  else{
+                    CustomDialog.showMessageDialog(
+                        context: context,
+                        title: 'Thông báo',
+                        message: 'Không tìm thấy nhật ký trong ngày ${h.date}'
+                    );
+                  }
+                },
+                icon: const Icon(Icons.menu_book_rounded),
+              ),
+
+              IconButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, 'habit-status-detail',arguments: h.date);
+                },
+                icon: const Icon(Icons.remove_red_eye),
+              ),
+            ],
+          )
         ],
       ),
     );

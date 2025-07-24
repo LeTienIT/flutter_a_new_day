@@ -71,6 +71,11 @@ class HabitListNotifier extends Notifier<HabitListState>{
     return false;
   }
 
+  bool isHabitForToday(HabitModel habit) {
+    final today = DateTime.now().weekday;
+    return habit.repeatDays.contains(today);
+  }
+
   Future<void> insertHabit(HabitModel h) async {
     try {
       if (h.icon?.isNotEmpty == true) {
@@ -81,6 +86,20 @@ class HabitListNotifier extends Notifier<HabitListState>{
         }
       }
       await habitDAO.insertHabit(h);
+
+      if (isHabitForToday(h)) {
+        final today = DateTime.now();
+        final todayDate = DateTime(today.year, today.month, today.day);
+        final habitStatus = HabitStatusModel(
+          id: null,
+          habitId: h.id!,
+          habitTitle: h.name,
+          date: todayDate,
+          completed: false,
+        );
+        await habitDAO.insertHabitStatus(habitStatus);
+      }
+
       await _loadData();
     } catch (e) {
       state = HabitListError(e.toString());
@@ -106,6 +125,24 @@ class HabitListNotifier extends Notifier<HabitListState>{
       }
 
       await habitDAO.updateHabit(hNew);
+      final isToday = isHabitForToday(hNew);
+      if (isToday) {
+        final today = DateTime.now();
+        final todayDate = DateTime(today.year, today.month, today.day);
+        final existing = await habitDAO.getHabitStatus(hNew.id!, todayDate);
+        if (existing == null) {
+          final status = HabitStatusModel(
+            id: null,
+            habitId: hNew.id!,
+            habitTitle: hNew.name,
+            date: todayDate,
+            completed: false,
+          );
+          await habitDAO.insertHabitStatus(status);
+        } else if (existing.habitTitle != hNew.name) {
+          await habitDAO.updateHabitStatus(existing);
+        }
+      }
       await _loadData();
     } catch (e) {
       state = HabitListError(e.toString());
@@ -117,6 +154,13 @@ class HabitListNotifier extends Notifier<HabitListState>{
       if (h.icon?.isNotEmpty == true ) {
         await _imageUtil.deleteFile(h.icon!);
       }
+
+      final today = DateTime.now();
+      final start = DateTime(today.year, today.month, today.day);
+      final end = start.add(const Duration(days: 1));
+
+      await habitDAO.deleteStatusesToday(h.id!, start, end);
+
       await habitDAO.deleteHabit(h.id!);
       await _loadData();
     } catch (e) {

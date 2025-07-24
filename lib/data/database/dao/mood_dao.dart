@@ -27,4 +27,19 @@ class MoodDAO extends DatabaseAccessor<AppDatabase> with _$MoodDAOMixin{
     final query = delete(moods)..where((h) => h.id.equals(id));
     return await query.go();
   }
+
+  Future<MoodModel?> getMoodByDate(DateTime date) async {
+    final start = DateTime(date.year, date.month, date.day);
+    final end = start.add(const Duration(days: 1));
+
+    final query = select(moods)
+      ..where((m) =>
+      m.date.isBiggerOrEqualValue(start) &
+      m.date.isSmallerThanValue(end)
+      );
+
+    final result = await query.getSingleOrNull();
+
+    return result?.toModel();
+  }
 }

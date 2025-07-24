@@ -82,7 +82,7 @@ class _MyAppState extends ConsumerState<MyApp> {
               return MaterialPageRoute(builder: (_) => HabitStatusDetailScreen(date: date));
           }
       },
-      home: HabitListScreen(),
+      home: HomeHabitScreen(),
     );
   }
 }
