@@ -29,6 +29,7 @@ class MoodHomeScreen extends ConsumerWidget {
           ),
         )
           : null,
+      drawer: Drawer(child: mCurrent == null ? Menu() : null,),
       body: switch (state) {
         MoodListLoading() => const Center(child: CircularProgressIndicator()),
 

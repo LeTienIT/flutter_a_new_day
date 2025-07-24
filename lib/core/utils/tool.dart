@@ -60,4 +60,4 @@ List<String> splitNoteToPages({required String note, required double maxWidth, r
   return pages;
 }
 
-
+DateTime normalizeDate(DateTime d) => DateTime(d.year, d.month, d.day);

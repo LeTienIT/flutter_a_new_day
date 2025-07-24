@@ -57,6 +57,9 @@ class HabitListScreen extends ConsumerWidget{
           },
         ),
       },
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pushNamed(context, '/habit-add'),
+        child: Icon(Icons.add_box_outlined),),
     );
   }
 

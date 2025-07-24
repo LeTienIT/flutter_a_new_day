@@ -37,6 +37,15 @@ class HabitListNotifier extends Notifier<HabitListState>{
     }
   }
 
+  Future<List<HabitModel>> getHabits() async {
+    if (state is HabitListData) {
+      return (state as HabitListData).listData;
+    } else {
+      final habits = await habitDAO.getAllHabit();
+      return habits;
+    }
+  }
+
   void setActiveItem(int? id) {
     final currentState = state;
     if (currentState is HabitListData) {
@@ -137,4 +146,25 @@ class HabitListNotifier extends Notifier<HabitListState>{
     }
   }
 
+  Future<void> generateTodayStatuses(List<HabitModel> habits) async {
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day); // bỏ giờ phút giây
+    final weekday = today.weekday; // từ 1 (T2) đến 7 (CN)
+
+    for (final habit in habits) {
+      if (!habit.repeatDays.contains(weekday)) continue; // bỏ qua nếu hôm nay không nằm trong repeat
+
+      final isExist = await habitDAO.isExist(habit.id!, todayDate); // check đã tạo HabitStatus chưa
+      if (!isExist) {
+        final status = HabitStatusModel(
+          habitId: habit.id!,
+          habitTitle: habit.name,
+          date: todayDate,
+          completed: false,
+        );
+
+        await habitDAO.insertHabitStatus(status); // tạo mới
+      }
+    }
+  }
 }

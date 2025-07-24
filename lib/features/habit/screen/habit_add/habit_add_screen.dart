@@ -27,7 +27,6 @@ class _AddHabitScreen extends ConsumerState<AddHabitScreen>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Thêm thói quen'),),
-      drawer: Drawer(child: Menu(),),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(

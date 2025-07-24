@@ -35,17 +35,6 @@ class HabitDAO extends DatabaseAccessor<AppDatabase> with _$HabitDAOMixin{
     return data.map((d)=>d.toModel()).toList();
   }
 
-  Future<bool> isExist(int habitId, DateTime date) async {
-    final query = await (select(habitStatus)
-      ..where((tbl) =>
-      tbl.habitId.equals(habitId) &
-      tbl.date.equals(DateTime(date.year, date.month, date.day))
-      )
-    ).getSingleOrNull();
-
-    return query != null;
-  }
-
   Future<int> insertHabitStatus(HabitStatusModel h) async{
     return await into(habitStatus).insert(h.toCompanion());
   }
@@ -59,4 +48,68 @@ class HabitDAO extends DatabaseAccessor<AppDatabase> with _$HabitDAOMixin{
     return await query.go();
   }
 
+  // Future<List<HabitStatusModel>> getHabitStatusesByDate(DateTime date) async {
+  //   final start = DateTime(date.year, date.month, date.day);
+  //   final end = start.add(Duration(days: 1));
+  //
+  //   final rs = await (select(habitStatus)
+  //     ..where((tbl) => tbl.date.isBetweenValues(start, end)))
+  //       .get();
+  //   return rs.map((d)=>d.toModel()).toList();
+  // }
+
+  Future<void> generateTodayStatuses() async {
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    final weekday = today.weekday;
+
+    final habits = await getAllHabit();
+
+    for (final h in habits) {
+      if (!h.repeatDays.contains(weekday)) continue;
+
+      final exists = await isExist(h.id!, todayDate);
+      if (!exists) {
+        final s = HabitStatusModel(
+          habitId: h.id!,
+          habitTitle: h.name,
+          date: todayDate,
+          completed: false,
+        );
+        await insertHabitStatus(s);
+      }
+    }
+  }
+
+  Future<bool> isExist(int habitId, DateTime date) async {
+    final query = await (
+        select(habitStatus)
+      ..where((tbl) => tbl.habitId.equals(habitId) & tbl.date.equals(DateTime(date.year, date.month, date.day))
+      )
+    ).getSingleOrNull();
+
+    return query != null;
+  }
+
+  Future<List<HabitStatusModel>> getAllHabitStatuses() async {
+    final rs = await (select(habitStatus)
+      ..orderBy([(tbl) => OrderingTerm(expression: tbl.date, mode: OrderingMode.desc)])
+    ).get();
+
+    return rs.map((d) => d.toModel()).toList();
+  }
+
+  Future<List<HabitStatusModel>> getHabitStatusesByDate(DateTime date) async {
+    final normalized = DateTime(date.year, date.month, date.day);
+
+    final nextDay = normalized.add(const Duration(days: 1));
+
+    final rs = await (select(habitStatus)
+      ..where((tbl) =>
+      tbl.date.isBiggerOrEqualValue(normalized) &
+      tbl.date.isSmallerThanValue(nextDay)))
+        .get();
+
+    return rs.map((e) => e.toModel()).toList();
+  }
 }

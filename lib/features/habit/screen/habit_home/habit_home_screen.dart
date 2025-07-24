@@ -1,8 +1,13 @@
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:io';
 
-import '../../../../data/database/dao/habit_dao.dart';
+import 'package:a_new_day/data/models/habit_status_model.dart';
+import 'package:a_new_day/features/habit/provider/today_habit_status_controller.dart';
+import 'package:a_new_day/features/menu/menu.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../data/database/providers/database_providers.dart';
 import '../../provider/habit_list_controller.dart';
+import '../../provider/habit_state.dart';
 
 class HomeHabitScreen extends ConsumerStatefulWidget{
   const HomeHabitScreen({super.key});
@@ -13,11 +18,95 @@ class HomeHabitScreen extends ConsumerStatefulWidget{
 }
 class _HomeHabitScreen extends ConsumerState<HomeHabitScreen>{
   @override
+  void initState() {
+    super.initState();
+  }
+  @override
   Widget build(BuildContext context) {
-    final state = ref.watch(habitListProvider);
-    final controller = ref.watch(habitListProvider.notifier);
+    final habitState = ref.watch(habitListProvider);
+    final statusState = ref.watch(todayHabitStatusProvider);
 
-    throw UnimplementedError();
+    if (habitState is! HabitListData || statusState.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final habits = (habitState as HabitListData).listData;
+    final statuses = statusState.value!;
+
+    final completed = statuses.where((s) => s.completed).length;
+    final total = statuses.length;
+    final percent = (completed / total * 100).toStringAsFixed(0);
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Hôm nay bạn thế nào'),),
+      drawer: Drawer(child: Menu(),),
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 10, bottom: 5),
+            child: Text("🎯 Hôm nay: $completed / $total ($percent%) hoàn thành"),
+          ),
+          Expanded(child: ListView.builder(
+            itemCount: statuses.length,
+            itemBuilder: (context, index) {
+              final status = statuses[index];
+              final habit = habits.firstWhere((h) => h.id == status.habitId);
+              String? iconPath = habit.icon;
+              return Container(
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: status.completed
+                      ? Colors.green[400]
+                      : Colors.orange[400],
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 28,
+                      backgroundImage: iconPath != null
+                          ? FileImage(File(iconPath!))
+                          : null,
+                      child: iconPath == null
+                          ? const Icon(Icons.insert_emoticon_outlined, size: 28)
+                          : null,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        habit.name,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    Checkbox(
+                      value: status.completed,
+                      onChanged: (value) async {
+                        final newStatus = HabitStatusModel(
+                            id: status.id,
+                            completed: value ?? false,
+                            habitId: status.habitId,
+                            habitTitle: status.habitTitle,
+                            date: status.date
+                        );
+                        await ref.read(todayHabitStatusProvider.notifier).updateStatus(newStatus);
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),),
+        ],
+      )
+    );
   }
 
 }

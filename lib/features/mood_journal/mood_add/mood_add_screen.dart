@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/utils/show_dialog.dart';
 import '../../../core/utils/tool.dart';
 import '../../../data/models/mood_model.dart';
 import '../emoji_repository.dart';
@@ -146,6 +147,14 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: selectedEmojiPath == null || slogan.isEmpty ? null : () async {
+                      if(selectedEmojiPath?.isEmpty == true || slogan?.isEmpty == true){
+                        await CustomDialog.showMessageDialog(
+                            context: context,
+                            title: 'Lỗi!',
+                            message: '- Biểu tượng cảm xúc\n\n "- Hôm nay thế nào" \n\n LÀ HAI DỮ LIỆU BẮT BUỘC - KHÔNG ĐỂ TRỐNG'
+                        );
+                        return;
+                      }
                       final newMood = MoodModel(
                         date: DateTime.now(),
                         emoji: '$selectedEmojiPath|$slogan',

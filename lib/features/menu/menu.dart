@@ -29,7 +29,7 @@ class Menu extends StatelessWidget{
                 initiallyExpanded: true,
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.list),
+                    leading: const Icon(Icons.today),
                     title: const Text('Hôm nay'),
                     onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-home', (route) => false),
                   ),
@@ -39,9 +39,9 @@ class Menu extends StatelessWidget{
                     onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-list', (route) => false),
                   ),
                   ListTile(
-                    leading: Icon(Icons.home),
-                    title: const Text('Thêm thói quen'),
-                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-add', (router) => false),
+                    leading: Icon(Icons.list_alt_rounded),
+                    title: const Text('Danh sách các ngày'),
+                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-status-list', (router) => false),
                   ),
                 ],
               ),
@@ -52,7 +52,7 @@ class Menu extends StatelessWidget{
                 initiallyExpanded: true,
                 children: [
                   ListTile(
-                    leading: Icon(Icons.home),
+                    leading: Icon(Icons.menu_book_rounded),
                     title: const Text('Nhật ký hôm nay'),
                     onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/mood-home', (router) => false),
                   ),
