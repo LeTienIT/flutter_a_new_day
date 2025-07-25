@@ -1,3 +1,5 @@
+import 'package:a_new_day/core/utils/app_security_storage.dart';
+import 'package:a_new_day/core/utils/tool.dart';
 import 'package:a_new_day/data/models/habit_model.dart';
 import 'package:a_new_day/data/models/mood_model.dart';
 import 'package:a_new_day/features/habit/screen/habit_add/habit_add_screen.dart';
@@ -8,6 +10,8 @@ import 'package:a_new_day/features/habit/screen/habit_list/habit_list_screen.dar
 import 'package:a_new_day/features/habit/screen/habit_list/habit_status_list_screen.dart';
 import 'package:a_new_day/features/mood_journal/mood_list/mood_list_screen.dart';
 import 'package:a_new_day/features/mood_journal/mood_view/mood_view_screen.dart';
+import 'package:a_new_day/features/security/authen_screen.dart';
+import 'package:a_new_day/features/security/security_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/dark_theme.dart';
@@ -34,10 +38,20 @@ class MyApp extends ConsumerStatefulWidget  {
 
 }
 class _MyAppState extends ConsumerState<MyApp> {
+  bool _lockApp = true;
+
   @override
   void initState() {
     super.initState();
     ref.read(emojisNotifierProvider);
+    _loadApp();
+  }
+
+  void _loadApp() async {
+    final lockApp = await AppSecurityStorage.isAppLockEnabled();
+    setState(() {
+      _lockApp = lockApp;
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -80,9 +94,11 @@ class _MyAppState extends ConsumerState<MyApp> {
             case '/habit-status-detail':
               final date = settings.arguments as DateTime;
               return MaterialPageRoute(builder: (_) => HabitStatusDetailScreen(date: date));
+            case '/security-screen':
+              return MaterialPageRoute(builder: (_) => SecurityScreen());
           }
       },
-      home: HomeHabitScreen(),
+      home: _lockApp ? PinAuthScreen(type: AuthType.app, go: true,) : HomeHabitScreen(),
     );
   }
 }

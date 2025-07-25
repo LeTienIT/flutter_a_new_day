@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
+enum AuthType {
+  app,
+  mood,
+}
+
 String formatVietnameseDate(DateTime date) {
   const weekdays = {
     1: 'Thứ Hai',

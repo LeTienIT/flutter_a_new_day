@@ -1,5 +1,10 @@
+import 'package:a_new_day/core/utils/app_security_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../core/utils/tool.dart';
+import '../habit/screen/habit_home/habit_home_screen.dart';
+import '../security/authen_screen.dart';
 
 class Menu extends StatelessWidget{
   const Menu({super.key});
@@ -54,14 +59,50 @@ class Menu extends StatelessWidget{
                   ListTile(
                     leading: Icon(Icons.menu_book_rounded),
                     title: const Text('Nhật ký hôm nay'),
-                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/mood-home', (router) => false),
+                    onTap: () async {
+                      final lockMood = await AppSecurityStorage.isMoodLockEnabled();
+                      if(lockMood && !AppSecurityStorage.hasUnlockedMoodOnce)
+                      {
+                        final unLocked = await Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(builder: (_) => PinAuthScreen(type: AuthType.mood)),
+                        );
+                        if(unLocked == true){
+                          Navigator.pushNamedAndRemoveUntil(context, '/mood-home', (router) => false);
+                        }
+                      }
+                      else{
+                        Navigator.pushNamedAndRemoveUntil(context, '/mood-home', (router) => false);
+                      }
+                    }
                   ),
                   ListTile(
                     leading: const Icon(Icons.list),
                     title: const Text('Danh sách nhật ký'),
-                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/mood-list', (route) => false),
+                    onTap: () async{
+                      final lockMood = await AppSecurityStorage.isMoodLockEnabled();
+                      if(lockMood && !AppSecurityStorage.hasUnlockedMoodOnce)
+                      {
+                        final unLocked = await Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(builder: (_) => PinAuthScreen(type: AuthType.mood)),
+                        );
+                        if(unLocked == true){
+                          Navigator.pushNamedAndRemoveUntil(context, '/mood-list', (router) => false);
+                        }
+                      }
+                      else{
+                        Navigator.pushNamedAndRemoveUntil(context, '/mood-list', (router) => false);
+                      }
+                    },
                   ),
                 ],
+              ),
+              Divider(height: 2,),
+              ListTile(
+                leading: const Icon(Icons.security),
+                title: const Text('Bảo mật'),
+                onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/security-screen', (route) => false),
               ),
             ],
           ),

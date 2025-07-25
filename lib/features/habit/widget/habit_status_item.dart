@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/utils/app_security_storage.dart';
 import '../../../core/utils/tool.dart';
+import '../../security/authen_screen.dart';
 
 class HabitStatusItem extends ConsumerWidget{
   final HabitStatusModel h;
@@ -84,7 +86,20 @@ class HabitStatusItem extends ConsumerWidget{
                 onPressed: () async{
                   final mood = await ref.read(moodDaoProvider).getMoodByDate(h.date);
                   if(mood != null){
-                    Navigator.pushNamed(context, '/mood-view',arguments: mood);
+                    final lockMood = await AppSecurityStorage.isMoodLockEnabled();
+                    if(lockMood && !AppSecurityStorage.hasUnlockedMoodOnce)
+                    {
+                      final unLocked = await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(builder: (_) => PinAuthScreen(type: AuthType.mood)),
+                      );
+                      if(unLocked == true){
+                        Navigator.pushNamed(context, '/mood-view',arguments: mood);
+                      }
+                    }
+                    else{
+                      Navigator.pushNamed(context, '/mood-view',arguments: mood);
+                    }
                   }
                   else{
                     CustomDialog.showMessageDialog(
