@@ -48,6 +48,11 @@ class HabitDAO extends DatabaseAccessor<AppDatabase> with _$HabitDAOMixin{
     return await query.go();
   }
 
+  Future<int> deleteHabitStatusByDate(DateTime date) async {
+    final query = delete(habitStatus)..where((h) => h.date.equals(date));
+    return await query.go();
+  }
+
   // Future<List<HabitStatusModel>> getHabitStatusesByDate(DateTime date) async {
   //   final start = DateTime(date.year, date.month, date.day);
   //   final end = start.add(Duration(days: 1));

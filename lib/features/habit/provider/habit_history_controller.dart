@@ -64,5 +64,10 @@ class HabitHistoryNotifier extends AsyncNotifier<List<HabitStatusModel>> {
     return result;
   }
 
+  Future<void> deleteHabitStatus(HabitStatusModel h) async {
+    state = const AsyncLoading();
+    await dao.deleteHabitStatusByDate(h.date);
+    await reloadAll();
+  }
 }
 

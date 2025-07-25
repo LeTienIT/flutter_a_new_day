@@ -77,7 +77,7 @@ class _MyAppState extends ConsumerState<MyApp> {
               );
             case '/habit-status-list':
               return MaterialPageRoute(builder: (_) => HabitStatusListScreen());
-            case 'habit-status-detail':
+            case '/habit-status-detail':
               final date = settings.arguments as DateTime;
               return MaterialPageRoute(builder: (_) => HabitStatusDetailScreen(date: date));
           }

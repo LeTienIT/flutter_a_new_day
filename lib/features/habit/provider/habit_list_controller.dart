@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils/image_utils.dart';
 import '../../../data/models/habit_status_model.dart';
+import 'habit_history_controller.dart';
 
 final habitListProvider = NotifierProvider<HabitListNotifier, HabitListState>(
     HabitListNotifier.new
@@ -31,6 +32,17 @@ class HabitListNotifier extends Notifier<HabitListState>{
       state = HabitListLoading();
       final data = await habitDAO.getAllHabit();
       await _generateTodayStatuses(data);
+      state = HabitListData(data);
+    }catch(e){
+      state = HabitListError(e.toString());
+    }
+  }
+
+  Future<void> _refreshData() async {
+    try{
+      state = HabitListLoading();
+      final data = await habitDAO.getAllHabit();
+      // print("Data: $data");
       state = HabitListData(data);
     }catch(e){
       state = HabitListError(e.toString());
@@ -68,7 +80,7 @@ class HabitListNotifier extends Notifier<HabitListState>{
             (habit) => habit.name.trim().toLowerCase() == normalizedName,
       );
     }
-    return false;
+    return true;
   }
 
   bool isHabitForToday(HabitModel habit) {
@@ -85,14 +97,13 @@ class HabitListNotifier extends Notifier<HabitListState>{
           h.icon = saved.path;
         }
       }
-      await habitDAO.insertHabit(h);
+      int id = await habitDAO.insertHabit(h);
 
       if (isHabitForToday(h)) {
         final today = DateTime.now();
         final todayDate = DateTime(today.year, today.month, today.day);
         final habitStatus = HabitStatusModel(
-          id: null,
-          habitId: h.id!,
+          habitId: id,
           habitTitle: h.name,
           date: todayDate,
           completed: false,
@@ -100,7 +111,8 @@ class HabitListNotifier extends Notifier<HabitListState>{
         await habitDAO.insertHabitStatus(habitStatus);
       }
 
-      await _loadData();
+      await _refreshData();
+      await ref.read(habitHistoryProvider.notifier).reloadAll();
     } catch (e) {
       state = HabitListError(e.toString());
     }
@@ -144,6 +156,7 @@ class HabitListNotifier extends Notifier<HabitListState>{
         }
       }
       await _loadData();
+      await ref.read(habitHistoryProvider.notifier).reloadAll();
     } catch (e) {
       state = HabitListError(e.toString());
     }
@@ -163,6 +176,7 @@ class HabitListNotifier extends Notifier<HabitListState>{
 
       await habitDAO.deleteHabit(h.id!);
       await _loadData();
+      await ref.read(habitHistoryProvider.notifier).reloadAll();
     } catch (e) {
       state = HabitListError(e.toString());
     }
@@ -188,6 +202,7 @@ class HabitListNotifier extends Notifier<HabitListState>{
         await habitDAO.insertHabitStatus(status);
       }
     }
+    await _refreshData();
   }
 
   Future<void> generateTodayStatuses(List<HabitModel> habits) async {

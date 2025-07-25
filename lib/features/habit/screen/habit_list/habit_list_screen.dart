@@ -21,7 +21,7 @@ class HabitListScreen extends ConsumerWidget{
       drawer: Drawer(child: Menu(),),
       body: switch(state){
         HabitListLoading() => const Center(child: const CircularProgressIndicator(),),
-        HabitListError(:final message) => Center(child: Text('Error: $message')),
+        HabitListError(:final message) => Center(child: throw('Error: $message')),
         HabitListData(: final listData, : final activeItemId) => ListView.builder(
           itemCount: listData.length,
           itemBuilder: (_, idx){
@@ -45,11 +45,11 @@ class HabitListScreen extends ConsumerWidget{
                       message: 'Bạn thật sự muốn xóa đi thói quen này\n'
                           'Điều này sẽ chỉ ảnh hưởng đến hiện tại và tương lai.\n');
                   if(comfirm) {
-                    controller.deleteHabit(item);
+                    await controller.deleteHabit(item);
                     await CustomDialog.showMessageDialog(
                         context: context,
                         title: 'Thông báo',
-                        message: 'Thòi quen đã được xóa'
+                        message: 'Đã xóa'
                     );
                   }
                 }

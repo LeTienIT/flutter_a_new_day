@@ -3,7 +3,7 @@ description: "Ứng dụng theo dõi thói quen, cảm xúc và nhật ký hắn
 
 publish_to: 'none'
 
-version: 2.1.0+6
+version: 2.1.1+7
 
 environment:
   sdk: ^3.7.2
