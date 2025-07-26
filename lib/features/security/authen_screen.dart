@@ -2,6 +2,7 @@ import 'package:a_new_day/core/utils/show_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../core/utils/BiometricAuthGate.dart';
 import '../../core/utils/app_security_storage.dart';
 import '../../core/utils/tool.dart'; // nếu dùng CustomDialog
 
@@ -96,7 +97,8 @@ class _PinAuthScreenState extends State<PinAuthScreen> with SingleTickerProvider
         Navigator.pop(context, true);
       }
 
-    } else {
+    }
+    else {
       setState(() {
         _error = true;
         countMax++;
@@ -233,11 +235,25 @@ class _PinAuthScreenState extends State<PinAuthScreen> with SingleTickerProvider
                                       });
                                     }
                                     else{
-                                      await CustomDialog.showMessageDialog(
+                                      final otherComf = await CustomDialog.showConfirmDialog(
                                           context: context,
                                           title: 'Xác thực không thành công',
-                                          message: 'Câu trả lời không chính xác'
+                                          message: 'Câu trả lời không chính xác\n\n Xác thực bằng cách khác'
                                       );
+                                      if(otherComf){
+                                        final isAuthenticated = await BiometricAuthHelper.authenticate(context: context);
+                                        if (isAuthenticated) {
+                                          final pin = await AppSecurityStorage.getPin();
+                                          await CustomDialog.showMessageDialog(
+                                            context: context,
+                                            title: 'MÃ PIN HIỆN TẠI',
+                                            message: '$pin',
+                                          );
+                                          setState(() {
+                                            showRestCode = false;
+                                          });
+                                        }
+                                      }
                                     }
                                   }
                                 },
@@ -326,11 +342,25 @@ class _PinAuthScreenState extends State<PinAuthScreen> with SingleTickerProvider
                                       });
                                     }
                                     else{
-                                      await CustomDialog.showMessageDialog(
+                                      final otherConf = await CustomDialog.showConfirmDialog(
                                           context: context,
                                           title: 'Xác thực không thành công',
-                                          message: 'Câu trả lời không chính xác'
+                                          message: 'Câu trả lời không chính xác\n\nXác thực bằng mật khẩu điện thoại'
                                       );
+                                      if(otherConf){
+                                        final isAuthenticated = await BiometricAuthHelper.authenticate(context: context);
+                                        if (isAuthenticated) {
+                                          final pin = await AppSecurityStorage.getPinM();
+                                          await CustomDialog.showMessageDialog(
+                                            context: context,
+                                            title: 'MÃ PIN HIỆN TẠI',
+                                            message: '$pin',
+                                          );
+                                          setState(() {
+                                            showRestCode = false;
+                                          });
+                                        }
+                                      }
                                     }
                                   }
                                 },

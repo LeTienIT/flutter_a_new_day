@@ -3,7 +3,7 @@ description: "Ứng dụng theo dõi thói quen, cảm xúc và nhật ký hắn
 
 publish_to: 'none'
 
-version: 3.0.1+9
+version: 3.2.2+12
 
 environment:
   sdk: ^3.7.2
@@ -44,6 +44,7 @@ dependencies:
 
   collection: ^1.17.2
   flutter_secure_storage: ^9.2.4
+  local_auth: ^2.3.0
 
 dev_dependencies:
   flutter_test:
