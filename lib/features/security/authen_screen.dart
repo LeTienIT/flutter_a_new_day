@@ -52,12 +52,15 @@ class _PinAuthScreenState extends State<PinAuthScreen> with SingleTickerProvider
   void _load() async{
     final q1 = await AppSecurityStorage.getQuestion();
     final q2 = await AppSecurityStorage.getQuestionM();
-    setState(() {
-      _question1Controller = TextEditingController(text: q1.first);
-      _question2Controller = TextEditingController(text: q1.last);
-      _question1ControllerM = TextEditingController(text: q2.first);
-      _question2ControllerM = TextEditingController(text: q2.last);
-    });
+    if (!mounted) return;
+    if(q1.isNotEmpty&&q2.isNotEmpty) {
+      setState(() {
+        _question1Controller = TextEditingController(text: q1.first);
+        _question2Controller = TextEditingController(text: q1.last);
+        _question1ControllerM = TextEditingController(text: q2.first);
+        _question2ControllerM = TextEditingController(text: q2.last);
+      });
+    }
   }
   @override
   void dispose() {

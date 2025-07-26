@@ -27,7 +27,10 @@ class _HomeHabitScreen extends ConsumerState<HomeHabitScreen>{
     final habitState = ref.watch(habitListProvider);
     final statusState = ref.watch(todayHabitStatusProvider);
 
-    if (habitState is! HabitListData || statusState.isLoading) {
+    final isHabitLoaded = habitState is HabitListData;
+    final isStatusLoaded = !statusState.isLoading;
+
+    if (!isHabitLoaded || !isStatusLoaded) {
       return const Center(child: CircularProgressIndicator());
     }
 

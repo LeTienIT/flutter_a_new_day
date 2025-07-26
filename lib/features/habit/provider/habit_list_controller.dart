@@ -25,18 +25,18 @@ class HabitListNotifier extends Notifier<HabitListState>{
     return HabitListLoading();
   }
 
-  Future<void> refresh() async => _loadData();
-
   Future<void> _loadData() async {
     try{
       state = HabitListLoading();
       final data = await habitDAO.getAllHabit();
-      await _generateTodayStatuses(data);
+      // await _generateTodayStatuses(data);
       state = HabitListData(data);
     }catch(e){
       state = HabitListError(e.toString());
     }
   }
+
+  Future<void> refresh() async => _loadData();
 
   Future<void> _refreshData() async {
     try{
@@ -53,8 +53,14 @@ class HabitListNotifier extends Notifier<HabitListState>{
     if (state is HabitListData) {
       return (state as HabitListData).listData;
     } else {
-      final habits = await habitDAO.getAllHabit();
-      return habits;
+      try {
+        final habits = await habitDAO.getAllHabit();
+        state = HabitListData(habits);
+        return habits;
+      } catch (e) {
+        state = HabitListError(e.toString());
+        return [];
+      }
     }
   }
 
