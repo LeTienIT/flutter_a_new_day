@@ -29,7 +29,7 @@ class Menu extends StatelessWidget{
             children: [
               ExpansionTile(
                 leading: Icon(Icons.checklist_rtl_outlined),
-                title: const Text('Thói quen mỗi ngày'),
+                title: const Text('Năng lượng mỗi ngày'),
                 childrenPadding: EdgeInsets.only(left: 16),
                 initiallyExpanded: true,
                 children: [
@@ -40,12 +40,12 @@ class Menu extends StatelessWidget{
                   ),
                   ListTile(
                     leading: const Icon(Icons.list),
-                    title: const Text('Danh sách thói quen'),
+                    title: const Text('Danh sách nhiệm vụ'),
                     onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-list', (route) => false),
                   ),
                   ListTile(
                     leading: Icon(Icons.list_alt_rounded),
-                    title: const Text('Danh sách các ngày'),
+                    title: const Text('Các ngày qua'),
                     onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-status-list', (router) => false),
                   ),
                 ],

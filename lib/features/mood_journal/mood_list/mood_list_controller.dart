@@ -9,12 +9,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../../data/database/providers/database_providers.dart';
 
+final moodFilterProvider = StateProvider<DateTime?>((ref) => null);
+
+final filteredMoodListProvider = Provider<List<MoodModel>>((ref) {
+  final state = ref.watch(moodListProvider);
+  final filterDate = ref.watch(moodFilterProvider);
+
+  if (state is! MoodListData) return [];
+
+  if (filterDate == null) return state.listData;
+
+  return state.listData.where((mood) {
+    return mood.date.year == filterDate.year &&
+        mood.date.month == filterDate.month &&
+        mood.date.day == filterDate.day;
+  }).toList();
+});
+
+
 final moodListProvider = NotifierProvider<MoodListController, MoodListState>(
   MoodListController.new
 );
 
 class MoodListController extends Notifier<MoodListState>{
   late final MoodDAO moodDao;
+  DateTime? condition;
+
   @override
   MoodListState build() {
     moodDao = ref.read(moodDaoProvider);
@@ -174,6 +194,23 @@ class MoodListController extends Notifier<MoodListState>{
     }
     else{
       return [];
+    }
+  }
+
+  void filter(DateTime? filterDate) {
+    if (filterDate != null) {
+      final currentState = state;
+      if (currentState is MoodListData) {
+        final filteredList = currentState.listData.where((mood) {
+          return mood.date.year == filterDate.year &&
+              mood.date.month == filterDate.month &&
+              mood.date.day == filterDate.day;
+        }).toList();
+        state = MoodListData(filteredList, activeItemId: currentState.activeItemId);
+      }
+    }
+    else{
+      _loadData();
     }
   }
 }

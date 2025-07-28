@@ -36,7 +36,7 @@ class _EditHabitScreen extends ConsumerState<EditHabitScreen>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Thêm thói quen'),),
+      appBar: AppBar(title: Text('Thêm nhiệm vụ'),),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -44,7 +44,7 @@ class _EditHabitScreen extends ConsumerState<EditHabitScreen>{
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SessionTitle(title: 'Tên thói quen',subtitle: 'không được trùng',required: true,),
+              SessionTitle(title: 'Tên nhiệm vụ',subtitle: 'không được trùng',required: true,),
               TextForm(category: _name, title: 'Tên', hint: 'VD: Thể dục'),
 
               SessionTitle(title: 'Các ngày cần thực hiện'),
@@ -77,7 +77,7 @@ class _EditHabitScreen extends ConsumerState<EditHabitScreen>{
                             await CustomDialog.showMessageDialog(
                                 context: context,
                                 title: 'Lỗi!',
-                                message: 'Tên thói quen đã tồn tại. Hãy nhập thói quen khác'
+                                message: 'Tên nhiệm vụ đã tồn tại. Hãy nhập tên khác'
                             );
                             return;
                           }
@@ -86,7 +86,7 @@ class _EditHabitScreen extends ConsumerState<EditHabitScreen>{
                         await CustomDialog.showMessageDialog(
                             context: context,
                             title: 'Lỗi!',
-                            message: 'Chọn ít nhất 1 ngày thực hiện thói quen'
+                            message: 'Chọn ít nhất 1 ngày thực hiện'
                         );
                         return;
                       }
@@ -102,7 +102,7 @@ class _EditHabitScreen extends ConsumerState<EditHabitScreen>{
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Đã cập nhật')));
                     }
                   },
-                  child: Text('Lưu thói quen')
+                  child: Text('Lưu')
               )
             ],
           ),

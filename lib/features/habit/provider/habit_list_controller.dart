@@ -10,6 +10,22 @@ import '../../../core/utils/image_utils.dart';
 import '../../../data/models/habit_status_model.dart';
 import 'habit_history_controller.dart';
 
+final habitCondition = StateProvider<String?>((ref) => null);
+final filterHabitList = StateProvider<List<HabitModel>>(
+    (ref){
+      final habitP = ref.watch(habitListProvider);
+      final habitCon = ref.watch(habitCondition);
+
+      if(habitP is! HabitListData) return [];
+      if(habitCon == null) return habitP.listData;
+
+      final rs = habitP.listData.where((h) =>
+          h.name.toLowerCase().contains(habitCon.toLowerCase())
+      ).toList();
+
+      return rs;
+    }
+);
 final habitListProvider = NotifierProvider<HabitListNotifier, HabitListState>(
     HabitListNotifier.new
 );
