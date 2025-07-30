@@ -1,5 +1,8 @@
+import 'dart:ui' as ui;
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../../../data/models/dashboard.dart';
@@ -90,49 +93,53 @@ class ImageDotPainter extends FlDotPainter {
   final String imagePath;
   final double size;
 
+  static final Map<String, ui.Image> _imageCache = {};
+  static final Set<String> _loading = {};
+
   ImageDotPainter({
     required this.imagePath,
     this.size = 4,
-  });
+  }) {
+    _maybeLoadImage();
+  }
+
+  void _maybeLoadImage() {
+    if (_imageCache.containsKey(imagePath) || _loading.contains(imagePath)) return;
+
+    _loading.add(imagePath);
+
+    rootBundle.load(imagePath).then((data) async {
+      final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+      final frame = await codec.getNextFrame();
+      _imageCache[imagePath] = frame.image;
+    });
+  }
 
   @override
   void draw(Canvas canvas, FlSpot spot, Offset offsetInCanvas) {
-    final image = AssetImage(imagePath);
-    final imageStream = image.resolve(ImageConfiguration.empty);
+    final image = _imageCache[imagePath];
+    if (image == null) return;
 
-    imageStream.addListener(ImageStreamListener((ImageInfo info, bool _) {
-      final paint = Paint();
-      final srcSize = Size(info.image.width.toDouble(), info.image.height.toDouble());
-      final dstSize = Size(size, size);
+    final paint = Paint();
+    final src = Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble());
+    final dst = Rect.fromCenter(
+      center: offsetInCanvas,
+      width: size,
+      height: size,
+    );
 
-      // Calculate the rectangle to draw the image
-      final src = Rect.fromLTWH(0, 0, srcSize.width, srcSize.height);
-      final dst = Rect.fromCenter(
-        center: offsetInCanvas,
-        width: dstSize.width,
-        height: dstSize.height,
-      );
-
-      // Draw the image
-      canvas.drawImageRect(info.image, src, dst, paint);
-    }));
+    canvas.drawImageRect(image, src, dst, paint);
   }
 
   @override
   Size getSize(FlSpot spot) => Size(size, size);
 
   @override
-  FlDotPainter lerp(FlDotPainter a, FlDotPainter b, double t) {
-    // TODO: implement lerp
-    throw UnimplementedError();
-  }
+  FlDotPainter lerp(FlDotPainter a, FlDotPainter b, double t) => this;
 
   @override
-  // TODO: implement mainColor
-  Color get mainColor => throw UnimplementedError();
+  Color get mainColor => Colors.transparent;
 
   @override
-  // TODO: implement props
-  List<Object?> get props => throw UnimplementedError();
-
+  List<Object?> get props => [imagePath, size];
 }

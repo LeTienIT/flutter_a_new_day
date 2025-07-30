@@ -34,53 +34,30 @@ class Menu extends StatelessWidget{
               ),
               Divider(height: 2,),
               ExpansionTile(
-                leading: Icon(Icons.checklist_rtl_outlined),
-                title: const Text('Năng lượng mỗi ngày'),
-                childrenPadding: EdgeInsets.only(left: 16),
-                initiallyExpanded: true,
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.today),
-                    title: const Text('Hôm nay'),
-                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-home', (route) => false),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.list),
-                    title: const Text('Danh sách nhiệm vụ'),
-                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-list', (route) => false),
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.list_alt_rounded),
-                    title: const Text('Các ngày qua'),
-                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-status-list', (router) => false),
-                  ),
-                ],
-              ),
-              ExpansionTile(
                 leading: Icon(Icons.menu_book_outlined),
                 title: const Text('Nhật ký'),
                 childrenPadding: EdgeInsets.only(left: 16),
                 initiallyExpanded: true,
                 children: [
                   ListTile(
-                    leading: Icon(Icons.menu_book_rounded),
-                    title: const Text('Nhật ký hôm nay'),
-                    onTap: () async {
-                      final lockMood = await AppSecurityStorage.isMoodLockEnabled();
-                      if(lockMood && !AppSecurityStorage.hasUnlockedMoodOnce)
-                      {
-                        final unLocked = await Navigator.push<bool>(
-                          context,
-                          MaterialPageRoute(builder: (_) => PinAuthScreen(type: AuthType.mood)),
-                        );
-                        if(unLocked == true){
+                      leading: Icon(Icons.menu_book_rounded),
+                      title: const Text('Nhật ký hôm nay'),
+                      onTap: () async {
+                        final lockMood = await AppSecurityStorage.isMoodLockEnabled();
+                        if(lockMood && !AppSecurityStorage.hasUnlockedMoodOnce)
+                        {
+                          final unLocked = await Navigator.push<bool>(
+                            context,
+                            MaterialPageRoute(builder: (_) => PinAuthScreen(type: AuthType.mood)),
+                          );
+                          if(unLocked == true){
+                            Navigator.pushNamedAndRemoveUntil(context, '/mood-home', (router) => false);
+                          }
+                        }
+                        else{
                           Navigator.pushNamedAndRemoveUntil(context, '/mood-home', (router) => false);
                         }
                       }
-                      else{
-                        Navigator.pushNamedAndRemoveUntil(context, '/mood-home', (router) => false);
-                      }
-                    }
                   ),
                   ListTile(
                     leading: const Icon(Icons.list),
@@ -101,6 +78,29 @@ class Menu extends StatelessWidget{
                         Navigator.pushNamedAndRemoveUntil(context, '/mood-list', (router) => false);
                       }
                     },
+                  ),
+                ],
+              ),
+              ExpansionTile(
+                leading: Icon(Icons.checklist_rtl_outlined),
+                title: const Text('Năng lượng mỗi ngày'),
+                childrenPadding: EdgeInsets.only(left: 16),
+                initiallyExpanded: true,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.today),
+                    title: const Text('Nhiệm vụ hôm nay'),
+                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-home', (route) => false),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.list),
+                    title: const Text('Danh sách nhiệm vụ'),
+                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-list', (route) => false),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.list_alt_rounded),
+                    title: const Text('Danh sách ngày'),
+                    onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/habit-status-list', (router) => false),
                   ),
                 ],
               ),

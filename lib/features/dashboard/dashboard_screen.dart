@@ -14,7 +14,7 @@ class DashboardScreen extends ConsumerWidget{
     final state = ref.watch(dashboardProvider);
     final stateNotifier = ref.read(dashboardProvider.notifier);
     return Scaffold(
-      appBar: AppBar(title: Text('Dashboard'),),
+      appBar: AppBar(title: Text('Tổng quan'),),
       drawer: Drawer(child: Menu(),),
       body: state.when(
           data: (stats) {
@@ -38,7 +38,23 @@ class DashboardScreen extends ConsumerWidget{
                   const SizedBox(height: 16),
                   Text('Top công việc', style: Theme.of(context).textTheme.titleMedium),
                   HabitDoubleBarChart(data: doubleBarChart,),
+                  const SizedBox(height: 16),
 
+                  if (deleted.isNotEmpty) ...[
+                    Text('Các việc đã không còn thực hiện', style: Theme.of(context).textTheme.titleMedium),
+                    SizedBox(height: 8),
+                    ...deleted.map((item) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+                      child: Row(
+                        children: [
+                          Icon(Icons.close, color: Colors.red, size: 16),
+                          SizedBox(width: 8),
+                          Expanded(child: Text(item)),
+                        ],
+                      ),
+                    )).toList(),
+                    const SizedBox(height: 18),
+                  ]
                 ],
               ),
             );

@@ -59,6 +59,7 @@ class _MoodItem extends State<MoodItem>{
                         imagePath,
                         width: 64,
                         height: 64,
+                        fit: BoxFit.cover,
                       ),
                       const SizedBox(width: 16),
                       // Slogan & Note (bên phải)
@@ -69,6 +70,8 @@ class _MoodItem extends State<MoodItem>{
                             Text(
                               slogan,
                               style: Theme.of(context).textTheme.bodyMedium,
+                              maxLines: 2, // Giới hạn 1 dòng cho slogan
+                              overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 4),
                             Text(
