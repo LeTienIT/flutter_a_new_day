@@ -22,7 +22,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnect());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -39,6 +39,10 @@ class AppDatabase extends _$AppDatabase {
         await delete(emojiTable).go();
         await _insertDefaultEmojis();
       }
+      if (from <= 3) {
+        await delete(emojiTable).go();
+        await _insertDefaultEmojis();
+      }
     },
   );
 
@@ -51,120 +55,140 @@ class AppDatabase extends _$AppDatabase {
       batch.insertAll(
         emojiTable,
         [
+          // Tức giân - 4
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/angry-face.png',
             name: 'Tức giận quá, tực giận quá',
             enable: const Value(false),
-            nangLuong: const Value(2),
+            nangLuong: const Value(4),
           ),
+          // Yêu - 9
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/love.png',
             name: 'Cuộc đời thật là tười đẹp - hì hì',
             enable: const Value(false),
             nangLuong: const Value(9),
           ),
+          // Bình thường  - 5
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/neutral.png',
             name: 'Ồ! Lại một ngày bình thường',
             enable: const Value(false),
             nangLuong: const Value(5),
           ),
+          // Buồn - 3
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/sad.png',
             name: 'Hôm nay tôi buồn -_-',
             enable: const Value(false),
             nangLuong: const Value(3),
           ),
+          // Zo tri
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/vo_tri.png',
             name: 'Hì hì - Lại một ngày zô tri zô tri',
             enable: const Value(false),
-            nangLuong: const Value(2),
+            nangLuong: const Value(6),
           ),
+          // Yêu yêu - 8
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/yeu_yeu.png',
             name: 'Người yêu ơi có biết ...',
             enable: const Value(false),
             nangLuong: const Value(8),
           ),
+          // Hạnh phúc - 10
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/happy.png',
             name: 'Một ngày thật hạnh phúc - Zui Zui ^_^',
             enable: const Value(false),
             nangLuong: const Value(10),
           ),
+          // Phấn khích - 9
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/excited.png',
             name: 'AMAZING GOOD CHOP - Rất là phấn khích',
             enable: const Value(false),
             nangLuong: const Value(9),
           ),
+          // Biết ơn - 7
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/thanks.png',
             name: 'Xin cảm ơn!',
             enable: const Value(false),
-            nangLuong: const Value(8),
+            nangLuong: const Value(7),
           ),
+          // Thư gian - 7
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/relaxed.png',
             name: 'Thư giãn, thư gian, thả lỏng nào',
             enable: const Value(false),
             nangLuong: const Value(7),
           ),
+          // Tự tin - 8
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/smiley.png',
             name: 'Ố ồ Ô. Mình hôm nay thật ... - Quá là tự tin luôn',
             enable: const Value(false),
             nangLuong: const Value(8),
           ),
+          // Lạc quan - 9
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/positivity.png',
             name: 'Vui tươi - Zui zẻ - Lạc quan',
             enable: const Value(false),
             nangLuong: const Value(9),
           ),
+          // Lười biếng - 3
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/sloth.png',
             name: 'Có cảm giác nay thật lười biếng!',
             enable: const Value(false),
-            nangLuong: const Value(2),
+            nangLuong: const Value(3),
           ),
+          // Thờ ơ - 4 điểm
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/cartoon.png',
             name: 'Thờ ờ, thờ ơ mọi thứ',
             enable: const Value(false),
-            nangLuong: const Value(3),
+            nangLuong: const Value(4),
           ),
+          // Bối rối - 4
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/confused.png',
             name: 'Khá là "Bối rối" - phân vân',
             enable: const Value(false),
             nangLuong: const Value(4),
           ),
+          // Căng thẳng - 3
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/stress.png',
             name: 'Thật là căng thẳng quá đi à.',
             enable: const Value(false),
-            nangLuong: const Value(2),
+            nangLuong: const Value(3),
           ),
+          // Lo lắng - 3
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/shocked.png',
             name: 'Lo lắng - lo lắng - sao? Lo lắng!',
             enable: const Value(false),
             nangLuong: const Value(3),
           ),
+          // Alone - 4
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/alone.png',
             name: 'Alone - tôi đang một mình.',
             enable: const Value(false),
-            nangLuong: const Value(2),
+            nangLuong: const Value(4),
           ),
+          // Mệt mỏi - 3
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/tired.png',
             name: 'Một ngày mệt mỏi - RẤT MỆT MỎI!',
             enable: const Value(false),
-            nangLuong: const Value(1),
+            nangLuong: const Value(3),
           ),
+          // Nhút nhát - 3
           EmojiTableCompanion.insert(
             path: 'assets/emoji_default/overthinking.png',
             name: 'Thật sự có chút nhút nhát - hay do suy nghĩ nhiều nhỉ?',
