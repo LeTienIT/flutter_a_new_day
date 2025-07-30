@@ -56,40 +56,54 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                const Text('Tâm trạng của bạn?', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('Hôm nay bạn sao?', style: TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                Wrap(
-                  spacing: 5,
-                  runSpacing: 5,
-                  children: emojis.map((emoji) {
-                    final isSelected = selectedEmojiPath == emoji.path;
-                    return ChoiceChip(
-                      labelPadding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                      avatar: Image.asset(emoji.path, width: 20, height: 20),
-                      label: Text(
-                        emoji.name,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: isSelected ? Colors.white : Colors.black,
-                        ),
-                      ),
-                      selected: isSelected,
-                      selectedColor: Colors.blue,
-                      onSelected: (_) {
-                        setState(() {
-                          selectedEmojiPath = emoji.path;
-                          slogan = emoji.name;
-                          _sloganController.text = emoji.name;
-                        });
-                      },
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final screenWidth = constraints.maxWidth;
+                    final maxChipWidth = (screenWidth - 3 * 6) / 3;
+
+                    return Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: emojis.map((emoji) {
+                        final isSelected = selectedEmojiPath == emoji.path;
+                        return ChoiceChip(
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          avatar: Image.asset(emoji.path, width: 20, height: 20),
+                          label: ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: maxChipWidth),
+                            child: Text(
+                              emoji.name,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: isSelected ? Colors.white : Colors.black,
+                              ),
+                            ),
+                          ),
+                          selected: isSelected,
+                          selectedColor: Colors.blue,
+                          backgroundColor: Colors.grey[200],
+                          onSelected: (_) {
+                            setState(() {
+                              selectedEmojiPath = emoji.path;
+                              slogan = emoji.name;
+                              _sloganController.text = emoji.name;
+                            });
+                          },
+                        );
+                      }).toList(),
                     );
-                  }).toList(),
+                  },
                 ),
 
                 const SizedBox(height: 20),
 
                 TextField(
                   controller: _sloganController,
+                  maxLines: 2,
                   decoration: const InputDecoration(
                     labelText: 'Hôm nay thế nào?',
                     border: OutlineInputBorder(),
@@ -101,9 +115,9 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
 
                 TextField(
                   controller: _noteController,
-                  maxLines: 4,
+                  maxLines: 6,
                   decoration: const InputDecoration(
-                    labelText: 'Có nên ghi lại nhật ký không?',
+                    labelText: 'Nhật ký hôm nay!',
                     border: OutlineInputBorder(),
                   ),
                   onChanged: (val) => note = val,

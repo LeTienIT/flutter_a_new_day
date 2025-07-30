@@ -2,6 +2,7 @@ import 'package:a_new_day/core/utils/app_security_storage.dart';
 import 'package:a_new_day/core/utils/tool.dart';
 import 'package:a_new_day/data/models/habit_model.dart';
 import 'package:a_new_day/data/models/mood_model.dart';
+import 'package:a_new_day/features/dashboard/dashboard_screen.dart';
 import 'package:a_new_day/features/habit/screen/habit_add/habit_add_screen.dart';
 import 'package:a_new_day/features/habit/screen/habit_detail/habit_detail_screen.dart';
 import 'package:a_new_day/features/habit/screen/habit_detail/habit_status_detail_screen.dart';
@@ -96,9 +97,11 @@ class _MyAppState extends ConsumerState<MyApp> {
               return MaterialPageRoute(builder: (_) => HabitStatusDetailScreen(date: date));
             case '/security-screen':
               return MaterialPageRoute(builder: (_) => SecurityScreen());
+            case '/dashboard-screen':
+              return MaterialPageRoute(builder: (_) => DashboardScreen());
           }
       },
-      home: _lockApp ? PinAuthScreen(type: AuthType.app, go: true,) : HomeHabitScreen(),
+      home: _lockApp ? PinAuthScreen(type: AuthType.app, go: true,) : DashboardScreen(),
     );
   }
 }

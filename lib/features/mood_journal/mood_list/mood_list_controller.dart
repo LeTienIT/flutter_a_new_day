@@ -48,7 +48,8 @@ class MoodListController extends Notifier<MoodListState>{
     try{
       state = MoodListLoading();
       final moods = await moodDao.getAllMood();
-      state = MoodListData(moods);
+      final reversedMoods = moods.reversed.toList();
+      state = MoodListData(reversedMoods);
     }catch(e){
       state = MoodListError(e.toString());
     }

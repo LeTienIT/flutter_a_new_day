@@ -8,7 +8,8 @@ extension EmojiMapper on EmojiTableData{
       id: id,
       path: path,
       name: name,
-      enable: enable
+      enable: enable,
+      nangLuong: nangLuong
   );
 }
 extension EmojiModelMapper on EmojiModel{
@@ -18,6 +19,7 @@ extension EmojiModelMapper on EmojiModel{
       path: Value(path),
       name: Value(name),
       enable: Value(enable),
+      nangLuong: Value(nangLuong)
     );
   }
 }

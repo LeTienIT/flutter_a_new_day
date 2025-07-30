@@ -27,6 +27,12 @@ class Menu extends StatelessWidget{
         Expanded(
           child: ListView(
             children: [
+              ListTile(
+                leading: const Icon(Icons.dashboard_outlined),
+                title: const Text('Tổng quát'),
+                onTap: () => Navigator.pushNamedAndRemoveUntil(context, '/dashboard-screen', (route) => false),
+              ),
+              Divider(height: 2,),
               ExpansionTile(
                 leading: Icon(Icons.checklist_rtl_outlined),
                 title: const Text('Năng lượng mỗi ngày'),

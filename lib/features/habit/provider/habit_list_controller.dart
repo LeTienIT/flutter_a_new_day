@@ -26,6 +26,7 @@ final filterHabitList = StateProvider<List<HabitModel>>(
       return rs;
     }
 );
+
 final habitListProvider = NotifierProvider<HabitListNotifier, HabitListState>(
     HabitListNotifier.new
 );

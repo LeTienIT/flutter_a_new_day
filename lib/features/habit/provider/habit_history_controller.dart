@@ -48,6 +48,13 @@ class HabitHistoryNotifier extends AsyncNotifier<List<HabitStatusModel>> {
   late final HabitDAO dao;
   late List<HabitStatusModel> _listGoc;
 
+  List<HabitStatusModel> get rawList {
+    if (_listGoc.isEmpty) {
+      throw StateError('rawList is not initialized yet');
+    }
+    return _listGoc;
+  }
+
   @override
   Future<List<HabitStatusModel>> build() async {
     dao = ref.read(habitDaoProvider);

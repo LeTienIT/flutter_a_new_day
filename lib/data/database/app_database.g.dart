@@ -1247,8 +1247,20 @@ class $EmojiTableTable extends EmojiTable
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _nangLuongMeta = const VerificationMeta(
+    'nangLuong',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, path, name, enable];
+  late final GeneratedColumn<int> nangLuong = GeneratedColumn<int>(
+    'nang_luong',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, path, name, enable, nangLuong];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1286,6 +1298,12 @@ class $EmojiTableTable extends EmojiTable
         enable.isAcceptableOrUnknown(data['enable']!, _enableMeta),
       );
     }
+    if (data.containsKey('nang_luong')) {
+      context.handle(
+        _nangLuongMeta,
+        nangLuong.isAcceptableOrUnknown(data['nang_luong']!, _nangLuongMeta),
+      );
+    }
     return context;
   }
 
@@ -1315,6 +1333,11 @@ class $EmojiTableTable extends EmojiTable
             DriftSqlType.bool,
             data['${effectivePrefix}enable'],
           )!,
+      nangLuong:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}nang_luong'],
+          )!,
     );
   }
 
@@ -1329,11 +1352,13 @@ class EmojiTableData extends DataClass implements Insertable<EmojiTableData> {
   final String path;
   final String name;
   final bool enable;
+  final int nangLuong;
   const EmojiTableData({
     required this.id,
     required this.path,
     required this.name,
     required this.enable,
+    required this.nangLuong,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1342,6 +1367,7 @@ class EmojiTableData extends DataClass implements Insertable<EmojiTableData> {
     map['path'] = Variable<String>(path);
     map['name'] = Variable<String>(name);
     map['enable'] = Variable<bool>(enable);
+    map['nang_luong'] = Variable<int>(nangLuong);
     return map;
   }
 
@@ -1351,6 +1377,7 @@ class EmojiTableData extends DataClass implements Insertable<EmojiTableData> {
       path: Value(path),
       name: Value(name),
       enable: Value(enable),
+      nangLuong: Value(nangLuong),
     );
   }
 
@@ -1364,6 +1391,7 @@ class EmojiTableData extends DataClass implements Insertable<EmojiTableData> {
       path: serializer.fromJson<String>(json['path']),
       name: serializer.fromJson<String>(json['name']),
       enable: serializer.fromJson<bool>(json['enable']),
+      nangLuong: serializer.fromJson<int>(json['nangLuong']),
     );
   }
   @override
@@ -1374,6 +1402,7 @@ class EmojiTableData extends DataClass implements Insertable<EmojiTableData> {
       'path': serializer.toJson<String>(path),
       'name': serializer.toJson<String>(name),
       'enable': serializer.toJson<bool>(enable),
+      'nangLuong': serializer.toJson<int>(nangLuong),
     };
   }
 
@@ -1382,11 +1411,13 @@ class EmojiTableData extends DataClass implements Insertable<EmojiTableData> {
     String? path,
     String? name,
     bool? enable,
+    int? nangLuong,
   }) => EmojiTableData(
     id: id ?? this.id,
     path: path ?? this.path,
     name: name ?? this.name,
     enable: enable ?? this.enable,
+    nangLuong: nangLuong ?? this.nangLuong,
   );
   EmojiTableData copyWithCompanion(EmojiTableCompanion data) {
     return EmojiTableData(
@@ -1394,6 +1425,7 @@ class EmojiTableData extends DataClass implements Insertable<EmojiTableData> {
       path: data.path.present ? data.path.value : this.path,
       name: data.name.present ? data.name.value : this.name,
       enable: data.enable.present ? data.enable.value : this.enable,
+      nangLuong: data.nangLuong.present ? data.nangLuong.value : this.nangLuong,
     );
   }
 
@@ -1403,13 +1435,14 @@ class EmojiTableData extends DataClass implements Insertable<EmojiTableData> {
           ..write('id: $id, ')
           ..write('path: $path, ')
           ..write('name: $name, ')
-          ..write('enable: $enable')
+          ..write('enable: $enable, ')
+          ..write('nangLuong: $nangLuong')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, path, name, enable);
+  int get hashCode => Object.hash(id, path, name, enable, nangLuong);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1417,7 +1450,8 @@ class EmojiTableData extends DataClass implements Insertable<EmojiTableData> {
           other.id == this.id &&
           other.path == this.path &&
           other.name == this.name &&
-          other.enable == this.enable);
+          other.enable == this.enable &&
+          other.nangLuong == this.nangLuong);
 }
 
 class EmojiTableCompanion extends UpdateCompanion<EmojiTableData> {
@@ -1425,17 +1459,20 @@ class EmojiTableCompanion extends UpdateCompanion<EmojiTableData> {
   final Value<String> path;
   final Value<String> name;
   final Value<bool> enable;
+  final Value<int> nangLuong;
   const EmojiTableCompanion({
     this.id = const Value.absent(),
     this.path = const Value.absent(),
     this.name = const Value.absent(),
     this.enable = const Value.absent(),
+    this.nangLuong = const Value.absent(),
   });
   EmojiTableCompanion.insert({
     this.id = const Value.absent(),
     required String path,
     required String name,
     this.enable = const Value.absent(),
+    this.nangLuong = const Value.absent(),
   }) : path = Value(path),
        name = Value(name);
   static Insertable<EmojiTableData> custom({
@@ -1443,12 +1480,14 @@ class EmojiTableCompanion extends UpdateCompanion<EmojiTableData> {
     Expression<String>? path,
     Expression<String>? name,
     Expression<bool>? enable,
+    Expression<int>? nangLuong,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (path != null) 'path': path,
       if (name != null) 'name': name,
       if (enable != null) 'enable': enable,
+      if (nangLuong != null) 'nang_luong': nangLuong,
     });
   }
 
@@ -1457,12 +1496,14 @@ class EmojiTableCompanion extends UpdateCompanion<EmojiTableData> {
     Value<String>? path,
     Value<String>? name,
     Value<bool>? enable,
+    Value<int>? nangLuong,
   }) {
     return EmojiTableCompanion(
       id: id ?? this.id,
       path: path ?? this.path,
       name: name ?? this.name,
       enable: enable ?? this.enable,
+      nangLuong: nangLuong ?? this.nangLuong,
     );
   }
 
@@ -1481,6 +1522,9 @@ class EmojiTableCompanion extends UpdateCompanion<EmojiTableData> {
     if (enable.present) {
       map['enable'] = Variable<bool>(enable.value);
     }
+    if (nangLuong.present) {
+      map['nang_luong'] = Variable<int>(nangLuong.value);
+    }
     return map;
   }
 
@@ -1490,7 +1534,8 @@ class EmojiTableCompanion extends UpdateCompanion<EmojiTableData> {
           ..write('id: $id, ')
           ..write('path: $path, ')
           ..write('name: $name, ')
-          ..write('enable: $enable')
+          ..write('enable: $enable, ')
+          ..write('nangLuong: $nangLuong')
           ..write(')'))
         .toString();
   }
@@ -2175,6 +2220,7 @@ typedef $$EmojiTableTableCreateCompanionBuilder =
       required String path,
       required String name,
       Value<bool> enable,
+      Value<int> nangLuong,
     });
 typedef $$EmojiTableTableUpdateCompanionBuilder =
     EmojiTableCompanion Function({
@@ -2182,6 +2228,7 @@ typedef $$EmojiTableTableUpdateCompanionBuilder =
       Value<String> path,
       Value<String> name,
       Value<bool> enable,
+      Value<int> nangLuong,
     });
 
 class $$EmojiTableTableFilterComposer
@@ -2210,6 +2257,11 @@ class $$EmojiTableTableFilterComposer
 
   ColumnFilters<bool> get enable => $composableBuilder(
     column: $table.enable,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get nangLuong => $composableBuilder(
+    column: $table.nangLuong,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2242,6 +2294,11 @@ class $$EmojiTableTableOrderingComposer
     column: $table.enable,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get nangLuong => $composableBuilder(
+    column: $table.nangLuong,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$EmojiTableTableAnnotationComposer
@@ -2264,6 +2321,9 @@ class $$EmojiTableTableAnnotationComposer
 
   GeneratedColumn<bool> get enable =>
       $composableBuilder(column: $table.enable, builder: (column) => column);
+
+  GeneratedColumn<int> get nangLuong =>
+      $composableBuilder(column: $table.nangLuong, builder: (column) => column);
 }
 
 class $$EmojiTableTableTableManager
@@ -2301,11 +2361,13 @@ class $$EmojiTableTableTableManager
                 Value<String> path = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<bool> enable = const Value.absent(),
+                Value<int> nangLuong = const Value.absent(),
               }) => EmojiTableCompanion(
                 id: id,
                 path: path,
                 name: name,
                 enable: enable,
+                nangLuong: nangLuong,
               ),
           createCompanionCallback:
               ({
@@ -2313,11 +2375,13 @@ class $$EmojiTableTableTableManager
                 required String path,
                 required String name,
                 Value<bool> enable = const Value.absent(),
+                Value<int> nangLuong = const Value.absent(),
               }) => EmojiTableCompanion.insert(
                 id: id,
                 path: path,
                 name: name,
                 enable: enable,
+                nangLuong: nangLuong,
               ),
           withReferenceMapper:
               (p0) =>

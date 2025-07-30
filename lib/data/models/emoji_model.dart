@@ -3,6 +3,6 @@ class EmojiModel{
   String path;
   String name;
   bool enable;
-
-  EmojiModel({this.id, required this.path, required this.name, required this.enable});
+  int nangLuong;
+  EmojiModel({this.id, required this.path, required this.name, required this.enable, required this.nangLuong});
 }
