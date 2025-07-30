@@ -21,7 +21,7 @@ class DashboardScreen extends ConsumerWidget{
             final topUsed = stats.usageStats;
             final best = stats.completionRates;
             final doubleBarChart = stateNotifier.mergeUsageAndCompletion(topUsed, best).take(9).toList();
-            final moodListPoint = stats.moodEnergyPoint;
+            final moodListPoint = stats.moodEnergyPoint.reversed.toList();
             final deleted = stats.deletedHabitTitles;
             final daily = stats.daySummaries;
 

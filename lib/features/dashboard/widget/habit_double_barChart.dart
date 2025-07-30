@@ -89,13 +89,13 @@ class HabitDoubleBarChart extends StatelessWidget {
                     BarChartRodData(
                       toY: stat.count.toDouble(),
                       color: Colors.blue,
-                      width: 15,
+                      width: 5,
                       borderRadius: BorderRadius.zero,
                     ),
                     BarChartRodData(
                       toY: stat.percent * maxCount,
                       color: Colors.orange,
-                      width: 15,
+                      width: 5,
                       borderRadius: BorderRadius.zero,
                     ),
                   ],
@@ -106,8 +106,8 @@ class HabitDoubleBarChart extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: 10,),
-        _buildLegend()
+        _buildLegend(),
+        SizedBox(height: 10,)
       ],
     );
   }
@@ -130,7 +130,7 @@ class HabitDoubleBarChart extends StatelessWidget {
     return Column(
       children: [
         Wrap(
-          spacing: 12,
+          spacing: 2,
           runSpacing: 6,
           children: [
             Container(
@@ -140,7 +140,7 @@ class HabitDoubleBarChart extends StatelessWidget {
                 color: Colors.blue,
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 8),
             Text('Số lần làm'),
 
             const SizedBox(width: 12),
@@ -157,26 +157,29 @@ class HabitDoubleBarChart extends StatelessWidget {
           ]
         ),
         SizedBox(height: 5,),
-        Wrap(
-          spacing: 12,
-          runSpacing: 6,
-          children: habitColorMap.entries.map((entry) {
-            return Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: entry.value,
-                    shape: BoxShape.circle,
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 6,
+            children: habitColorMap.entries.map((entry) {
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: entry.value,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 4),
-                Text(entry.key),
-              ],
-            );
-          }).toList(),
+                  const SizedBox(width: 4),
+                  Text(entry.key),
+                ],
+              );
+            }).toList(),
+          ),
         )
       ],
     );
