@@ -50,7 +50,8 @@ class HabitHistoryNotifier extends AsyncNotifier<List<HabitStatusModel>> {
 
   List<HabitStatusModel> get rawList {
     if (_listGoc.isEmpty) {
-      throw StateError('rawList is not initialized yet');
+      // throw StateError('rawList is not initialized yet');
+      return [];
     }
     return _listGoc;
   }

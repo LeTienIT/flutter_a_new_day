@@ -3,25 +3,34 @@ import 'dart:ui' as ui;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../data/models/dashboard.dart';
+import '../dashboard_provider.dart';
 
-class MoodLineChart extends StatelessWidget {
+class MoodLineChart extends ConsumerWidget  {
   final List<MoodEnergyPoint> data;
 
   const MoodLineChart({super.key, required this.data});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (data.isEmpty) {
       return const Center(child: Text("Không có dữ liệu tâm trạng"));
     }
-
+    final imageCache = ref.watch(imageCacheProvider);
     final spots = List.generate(
       data.length,
           (index) => FlSpot(index.toDouble(), data[index].nangLuong.toDouble()),
     );
+
+    // Load ảnh tất cả emojiPath trong data
+    for (final item in data) {
+      if (!imageCache.containsKey(item.emojiPath)) {
+        ref.read(imageCacheProvider.notifier).loadImage(item.emojiPath);
+      }
+    }
 
     return AspectRatio(
       aspectRatio: 1.8,
@@ -42,8 +51,10 @@ class MoodLineChart extends StatelessWidget {
                 dotData: FlDotData(
                   show: true,
                   getDotPainter: (spot, percent, barData, index) {
+                    final emojiPath = data[index].emojiPath;
+                    final ui.Image? image = imageCache[emojiPath];
                     return ImageDotPainter(
-                      imagePath: data[index].emojiPath,
+                      image: image,
                       size: 18,
                     );
                   },
@@ -90,45 +101,27 @@ class MoodLineChart extends StatelessWidget {
 }
 
 class ImageDotPainter extends FlDotPainter {
-  final String imagePath;
+  final ui.Image? image;
   final double size;
 
-  static final Map<String, ui.Image> _imageCache = {};
-  static final Set<String> _loading = {};
-
   ImageDotPainter({
-    required this.imagePath,
+    required this.image,
     this.size = 4,
-  }) {
-    _maybeLoadImage();
-  }
-
-  void _maybeLoadImage() {
-    if (_imageCache.containsKey(imagePath) || _loading.contains(imagePath)) return;
-
-    _loading.add(imagePath);
-
-    rootBundle.load(imagePath).then((data) async {
-      final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
-      final frame = await codec.getNextFrame();
-      _imageCache[imagePath] = frame.image;
-    });
-  }
+  });
 
   @override
   void draw(Canvas canvas, FlSpot spot, Offset offsetInCanvas) {
-    final image = _imageCache[imagePath];
     if (image == null) return;
 
     final paint = Paint();
-    final src = Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble());
+    final src = Rect.fromLTWH(0, 0, image!.width.toDouble(), image!.height.toDouble());
     final dst = Rect.fromCenter(
       center: offsetInCanvas,
       width: size,
       height: size,
     );
 
-    canvas.drawImageRect(image, src, dst, paint);
+    canvas.drawImageRect(image!, src, dst, paint);
   }
 
   @override
@@ -141,5 +134,5 @@ class ImageDotPainter extends FlDotPainter {
   Color get mainColor => Colors.transparent;
 
   @override
-  List<Object?> get props => [imagePath, size];
+  List<Object?> get props => [image, size];
 }

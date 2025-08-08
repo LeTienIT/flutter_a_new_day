@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:a_new_day/data/models/dashboard.dart';
 import 'package:a_new_day/data/models/emoji_model.dart';
@@ -7,6 +8,7 @@ import 'package:a_new_day/features/habit/provider/habit_history_controller.dart'
 import 'package:a_new_day/features/habit/provider/habit_list_controller.dart';
 import 'package:a_new_day/features/mood_journal/mood_list/mood_list_state.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/habit_model.dart';
@@ -164,5 +166,29 @@ class DashboardNotifier extends AsyncNotifier<DashboardMain>{
     }
 
     return moodEnergyPoints.take(8).toList();
+  }
+}
+
+final imageCacheProvider = StateNotifierProvider<ImageCacheNotifier, Map<String, ui.Image>>((ref) {
+  return ImageCacheNotifier();
+});
+
+class ImageCacheNotifier extends StateNotifier<Map<String, ui.Image>> {
+  ImageCacheNotifier() : super({});
+
+  final Set<String> _loading = {};
+
+  Future<void> loadImage(String path) async {
+    if (state.containsKey(path) || _loading.contains(path)) return;
+
+    _loading.add(path);
+
+    final data = await rootBundle.load(path);
+    final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+    final frame = await codec.getNextFrame();
+
+    state = {...state, path: frame.image};
+
+    _loading.remove(path);
   }
 }

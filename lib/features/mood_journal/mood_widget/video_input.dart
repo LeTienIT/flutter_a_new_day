@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 import '../../../core/utils/video_utils.dart';
 import 'package:chewie/chewie.dart';
@@ -83,6 +85,37 @@ class _VideoInputState extends State<VideoInput> {
     super.dispose();
   }
 
+  Future<int> saveVideoToGallery(File videoFile) async {
+    bool granted = false;
+
+    if (Platform.isAndroid) {
+      if (await Permission.storage.request().isGranted) {
+        granted = true;
+      } else if (await Permission.photos.request().isGranted) {
+        granted = true;
+      } else if (await Permission.mediaLibrary.request().isGranted) {
+        granted = true;
+      }
+    } else if (Platform.isIOS) {
+      if (await Permission.photos.request().isGranted) {
+        granted = true;
+      }
+    }
+
+    if (!granted) return -1;
+
+    final result = await ImageGallerySaverPlus.saveFile(
+      videoFile.path,
+      name: "saved_video_${DateTime.now().millisecondsSinceEpoch}",
+    );
+
+    if (result['isSuccess'] == true || (result['filePath'] != null && result['filePath'] != "")) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget videoWidget;
@@ -109,8 +142,37 @@ class _VideoInputState extends State<VideoInput> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          videoWidget,
-          if(widget.enableEdit)...[
+          Stack(
+            alignment: Alignment.topRight,
+            children: [
+              videoWidget,
+              if (_videoFile != null)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                    icon: Icon(Icons.download, color: Colors.white),
+                    onPressed: () async {
+                      final status = await saveVideoToGallery(_videoFile!);
+                      if (!mounted) return;
+                      if (status == 1) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Đã lưu video vào thư viện')),
+                        );
+                      } else if (status == 0) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Lưu video thất bại')),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Chưa cấp quyền lưu video')),
+                        );
+                      }
+                    },
+                  ),
+                ),
+            ],
+          ),
+          if (widget.enableEdit) ...[
             const SizedBox(height: 10),
             ElevatedButton.icon(
               onPressed: _pickVideo,
@@ -118,9 +180,9 @@ class _VideoInputState extends State<VideoInput> {
               label: const Text('Video đẹp nhất hôm nay'),
             ),
             const SizedBox(height: 10),
-            if(_videoFile!=null)
+            if (_videoFile != null)
               ElevatedButton.icon(
-                onPressed: _videoFile!=null ? _deleteVideo : null,
+                onPressed: _deleteVideo,
                 icon: const Icon(Icons.delete),
                 label: const Text('Xóa video hiện tại'),
               )

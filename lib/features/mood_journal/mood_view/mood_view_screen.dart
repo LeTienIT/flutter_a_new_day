@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:page_flip/page_flip.dart';
 import '../../../core/utils/tool.dart';
 import '../mood_list/mood_list_controller.dart';
+import '../mood_widget/full_image_screen.dart';
 import '../mood_widget/input_audio.dart';
 import '../mood_widget/video_input.dart';
 
@@ -234,14 +235,24 @@ class MoodViewScreen extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (image?.isNotEmpty == true)...[
+            if (image?.isNotEmpty == true) ...[
               Text('Bức ảnh đẹp nhất ngày đó'),
-              SizedBox(height: 20,),
-              Image.file(
-                File(image!),
-                fit: BoxFit.cover,
+              SizedBox(height: 20),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => FullScreenImagePage(imagePath: image!),
+                    ),
+                  );
+                },
+                child: Image.file(
+                  File(image!),
+                  fit: BoxFit.cover,
+                ),
               ),
-              SizedBox(height: 20,),
+              SizedBox(height: 20),
             ],
             if (video?.isNotEmpty == true)...[
               Text('Khoảnh khắc kỷ niệm'),

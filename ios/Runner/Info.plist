@@ -6,8 +6,10 @@
     <string>Dùng để xác thực người dùng</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Chúng tôi cần quyền truy cập micro để ghi âm.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>App cần quyền để lưu ảnh vào thư viện.</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>Ứng dụng cần truy cập ảnh để người dùng chọn.</string>
+    <string>App cần quyền để truy cập thư viện ảnh.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

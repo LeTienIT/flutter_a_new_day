@@ -25,7 +25,7 @@ final darkTheme = ThemeData(
     titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'DFVN'),
   ),
 
-  cardTheme: const CardTheme(
+  cardTheme: const CardThemeData(
     color: Color(0xFF1E1E1E),
     elevation: 2,
     shape: RoundedRectangleBorder(

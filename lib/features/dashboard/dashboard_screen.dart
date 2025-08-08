@@ -37,9 +37,10 @@ class DashboardScreen extends ConsumerWidget{
                   Text('(7 ngày gần nhất)', style: Theme.of(context).textTheme.bodySmall),
                   const SizedBox(height: 16),
                   Text('Top công việc', style: Theme.of(context).textTheme.titleMedium),
-                  HabitDoubleBarChart(data: doubleBarChart,),
-                  const SizedBox(height: 16),
-
+                  if(doubleBarChart.isNotEmpty)...[
+                    HabitDoubleBarChart(data: doubleBarChart,),
+                    const SizedBox(height: 16),
+                  ],
                   if (deleted.isNotEmpty) ...[
                     Text('Các việc đã không còn thực hiện', style: Theme.of(context).textTheme.titleMedium),
                     SizedBox(height: 8),
@@ -59,7 +60,7 @@ class DashboardScreen extends ConsumerWidget{
               ),
             );
           },
-          error: (error, _) => Center(child: Text('Error: $error'),),
+          error: (error, _) => throw Exception(error),
           loading: () => const CircularProgressIndicator()
       )
     );
