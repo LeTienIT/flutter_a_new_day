@@ -43,7 +43,7 @@ class HabitDoubleBarChart extends StatelessWidget {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      interval: 1,
+                      interval: maxCount > 10 ? maxCount / 10 : 1,
                       getTitlesWidget: (value, meta) {
                         return Text(value.toInt().toString());
                       },

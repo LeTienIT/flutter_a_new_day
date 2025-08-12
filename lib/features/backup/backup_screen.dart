@@ -188,24 +188,24 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          RichText(
-            text: TextSpan(
-                  text: 'Kiến nghị',style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
-                children: [
-                  TextSpan(
-                      text: '\n - Sử dụng tính năng đồng bộ'
-                          '\n - Đồng bộ là thêm toàn bộ các dữ liệu cũ và không xóa dữ liệu hiện tại',
-                      style: TextStyle(color: Colors.green, fontStyle: FontStyle.italic, fontSize: 16)
-                  ),
-                  TextSpan(
-                      text: '\n <=> Với các dữ liệu bị xung đột, bạn sẽ lựa chọn 2 cách giải quyết'
-                          '\n - 1: Ghi đè lên dữ liệu hiện tại'
-                          '\n - 2: Bỏ qua dữ liệu khôi phục và sử dụng dữ liệu hiện tại',
-                      style: TextStyle(color: Colors.orangeAccent, fontStyle: FontStyle.italic, fontSize: 16)
-                  ),
-                ]
-            ),
-          ),
+          // RichText(
+          //   text: TextSpan(
+          //         text: 'Kiến nghị',style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+          //       children: [
+          //         TextSpan(
+          //             text: '\n - Sử dụng tính năng đồng bộ'
+          //                 '\n - Đồng bộ là thêm toàn bộ các dữ liệu cũ và không xóa dữ liệu hiện tại',
+          //             style: TextStyle(color: Colors.green, fontStyle: FontStyle.italic, fontSize: 16)
+          //         ),
+          //         TextSpan(
+          //             text: '\n <=> Với các dữ liệu bị xung đột, bạn sẽ lựa chọn 2 cách giải quyết'
+          //                 '\n - 1: Ghi đè lên dữ liệu hiện tại'
+          //                 '\n - 2: Bỏ qua dữ liệu khôi phục và sử dụng dữ liệu hiện tại',
+          //             style: TextStyle(color: Colors.orangeAccent, fontStyle: FontStyle.italic, fontSize: 16)
+          //         ),
+          //       ]
+          //   ),
+          // ),
           const SizedBox(height: 20),
           ElevatedButton.icon(
             icon: const Icon(Icons.folder_open),

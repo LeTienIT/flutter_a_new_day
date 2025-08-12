@@ -3,7 +3,7 @@ description: "Ứng dụng theo dõi thói quen, cảm xúc và nhật ký hắn
 
 publish_to: 'none'
 
-version: 4.4.9+29
+version: 4.5.1+30
 
 environment:
   sdk: ^3.7.2
@@ -65,6 +65,7 @@ flutter:
   assets:
     - assets/emoji_default/
     - assets/sticker/
+    - assets/welcome.json
 
   fonts:
     - family: PlaywriteVNGuides
