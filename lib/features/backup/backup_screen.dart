@@ -31,7 +31,10 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
       builder: (ctx) => AlertDialog(
         title: const Text('Xác nhận sao lưu dữ liệu'),
         content: const Text(
-          'Vui lòng không thoát hay tắt ứng dụng trong quá trình sao lưu.',
+          'Vui lòng không thoát hay tắt ứng dụng trong quá trình sao lưu.\n\n'
+              '-  Khi file nặng > 1GB, quá trình lưu file có thể bị giật, lang, ...\n'
+              '-  Trong quá trình đó, không được thoát hay tắt app. Sau khi lưu thành công, app sẽ trở về giao diện\n\n'
+              'Bạn nên sử dụng tính năng dọn dẹp bộ nhớ sau khi tạo file backup.',
           style: TextStyle(
             color: Colors.red,
             fontStyle: FontStyle.italic,
@@ -59,19 +62,32 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
     try {
       final db = ref.read(appDatabaseProvider);
       await db.close();
-      await backupAndSaveToDownloads();
+      File zipFile = await createFullBackup(); // <- function bạn đã có
+      await saveLargeBackup(zipFile);
       setState(() {
-        fileBackup = 'Đã tạo file sao lưu!';
+        fileBackup = 'Đã tạo file sao lưu';
       });
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sao lưu thành công!')),
+        const SnackBar(content: Text('Sao lưu thành công! ')),
+      );
+    } on PlatformException catch (e) {
+      setState(() {
+        fileBackup = '${e.message}';
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi flatform: ${e.message}')),
       );
     } catch (e) {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text('Lỗi khi sao lưu: $e')),
-      // );
-      throw(e);
+      setState(() {
+        fileBackup = e.toString();
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi khi sao lưu: $e')),
+      );
+
     } finally {
       if (mounted) setState(() => isProcessing = false);
     }
@@ -123,8 +139,20 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
             ),
             ElevatedButton.icon(
               onPressed: null,
-              icon: const Icon(Icons.sync_lock_outlined),
-              label: const Text('Đồng bộ'),
+              icon: const Icon(Icons.lock),
+              label: RichText(text: TextSpan(
+                text: 'Đồng bộ',
+                children: [
+                  TextSpan(
+                    text: '\n   (khóa)',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.red,
+
+                    ),
+                  )
+                ]
+              )),
             ),
           ],
         ),
@@ -251,8 +279,20 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
                 },
               ),
               ElevatedButton.icon(
-                icon: const Icon(Icons.cloud_sync_sharp),
-                label: const Text('Đồng bộ'),
+                icon: const Icon(Icons.lock),
+                label: RichText(text: TextSpan(
+                    text: 'Đồng bộ',
+                    children: [
+                      TextSpan(
+                        text: '\n   (khóa)',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.red,
+
+                        ),
+                      )
+                    ]
+                )),
                 onPressed: null,
               ),
             ],
@@ -262,10 +302,11 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sao chép & khôi phục dữ liệu')),
+      appBar: AppBar(title: const Text('Sao lưu & khôi phục')),
       drawer: const Drawer(child: Menu()),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
