@@ -60,14 +60,14 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
     setState(() => isProcessing = true);
 
     try {
-      final db = ref.read(appDatabaseProvider);
-      await db.close();
+      // final db = ref.read(appDatabaseProvider);
+      // await db.close();
       File zipFile = await createFullBackup(); // <- function bạn đã có
       await saveLargeBackup(zipFile);
       setState(() {
         fileBackup = 'Đã tạo file sao lưu';
       });
-
+      // await db.open();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Sao lưu thành công! ')),

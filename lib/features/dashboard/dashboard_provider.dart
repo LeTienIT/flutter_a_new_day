@@ -95,7 +95,7 @@ class DashboardNotifier extends AsyncNotifier<DashboardMain>{
       final total = list.length;
       final completed = list.where((s) => s.completed).length;
       final double rate = (total == 0) ? 0 : (completed / total);
-      print("rate: $rate");
+      // print("rate: $rate");
       result.add(HabitCompletionRate(title: title, rate: rate, total: total));
     });
 
