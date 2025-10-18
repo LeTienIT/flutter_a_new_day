@@ -1,7 +1,16 @@
 import UIKit
 import Flutter
 import UniformTypeIdentifiers
-
+// Mức Swift cần cho Flutter developer
+// Bạn không cần học full SwiftUI, UIKit, AutoLayout… mà chỉ cần:
+//
+// Cú pháp Swift cơ bản (class, function, optional, if/else…).
+//
+// Cách viết AppDelegate & UIViewController.
+//
+// Cách gọi API native (Camera, GPS…).
+//
+// Cách Flutter ↔ Swift giao tiếp bằng Platform Channel.
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate, UIDocumentPickerDelegate {
 
