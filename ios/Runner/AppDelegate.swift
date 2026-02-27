@@ -11,7 +11,7 @@ import UniformTypeIdentifiers
 // Cách gọi API native (Camera, GPS…).
 //
 // Cách Flutter ↔ Swift giao tiếp bằng Platform Channel.
-@UIApplicationMain
+@main
 @objc class AppDelegate: FlutterAppDelegate, UIDocumentPickerDelegate {
 
     var srcPathToCopy: String?
