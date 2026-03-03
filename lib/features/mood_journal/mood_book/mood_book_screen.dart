@@ -27,15 +27,16 @@ class _MoodBookScreenState extends ConsumerState<MoodBookScreen> {
   @override
   void initState() {
     super.initState();
-    _preparePages();
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      _preparePages();
+    });
   }
 
   Future<void> _preparePages() async {
     await Future.delayed(const Duration(milliseconds: 50));
 
     final builtPages = _buildAllPages(context);
-
-    await Future.delayed(const Duration(seconds: 10));
 
     if (mounted) {
       setState(() {
@@ -62,8 +63,6 @@ class _MoodBookScreenState extends ConsumerState<MoodBookScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = GlobalKey<PageFlipWidgetState>();
-
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -80,7 +79,7 @@ class _MoodBookScreenState extends ConsumerState<MoodBookScreen> {
             key: controller,
             backgroundColor: const Color(0xFFFBF6EF),
             lastPage: buildCoverPage(),
-            children: _buildAllPages(context),
+            children: pages!,
           ),
         ),
       )

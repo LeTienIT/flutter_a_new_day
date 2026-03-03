@@ -120,12 +120,12 @@ class _DashboardScreen extends ConsumerState<DashboardScreen>{
                                     Navigator.pushNamedAndRemoveUntil(context, '/mood-home', (router) => false);
                                   }
                                 },
-                                child: const Text("Nhật ký"),
+                                child: const Text("Nhật ký", textAlign: TextAlign.center,),
                               ),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
-                              child: OutlinedButton(
+                              child: ElevatedButton(
                                 onPressed: () async {
                                   final lockMood = await AppSecurityStorage.isMoodLockEnabled();
                                   if(lockMood && !AppSecurityStorage.hasUnlockedMoodOnce)
@@ -142,19 +142,16 @@ class _DashboardScreen extends ConsumerState<DashboardScreen>{
                                     Navigator.pushNamedAndRemoveUntil(context, '/mood-list', (router) => false);
                                   }
                                 },
-                                child: const Text("Danh sách"),
+                                child: const Text("Danh sách", textAlign: TextAlign.center,),
                               ),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
-                                ),
                                 onPressed: () {
                                   Navigator.pushNamedAndRemoveUntil(context, '/habit-home', (route) => false);
                                 },
-                                child: const Text("Công việc"),
+                                child: const Text("Hằng ngày", textAlign: TextAlign.center,),
                               ),
                             ),
                           ],
