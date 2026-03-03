@@ -60,201 +60,203 @@ class _SecurityScreen extends State<SecurityScreen>{
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Thiết lập bảo mật')),
-      drawer: Drawer(child: Menu(),),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(left: 28),
-              child: SwitchListTile(
-                  title: Text('Bảo mật ứng dụng',),
-                  value: _lockApp,
-                  onChanged: (bool value) async {
-                    if(value){
-                      setState(() {
-                        _showForm = true;
-                      });
-                    }
-                    else{
-                      final unLocked = await Navigator.push<bool>(
-                        context,
-                        MaterialPageRoute(builder: (_) => PinAuthScreen(type: AuthType.app,go: false,)),
-                      );
-                      if(unLocked == true){
-                        final comfirm = await CustomDialog.showConfirmDialog(
-                            context: context,
-                            title: 'Xác nhận',
-                            message: 'Tắt bảo mật ứng dụng\n\n- Bỏ mật mã khi mở app'
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        appBar: AppBar(title: Text('Thiết lập bảo mật')),
+        drawer: Drawer(child: Menu(),),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(left: 28),
+                child: SwitchListTile(
+                    title: Text('Bảo mật ứng dụng',),
+                    value: _lockApp,
+                    onChanged: (bool value) async {
+                      if(value){
+                        setState(() {
+                          _showForm = true;
+                        });
+                      }
+                      else{
+                        final unLocked = await Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(builder: (_) => PinAuthScreen(type: AuthType.app,go: false,)),
                         );
-                        if(comfirm){
-                          AppSecurityStorage.setAppLockEnabled(false);
-                          setState(() {
-                            _lockApp = value;
-                          });
+                        if(unLocked == true){
+                          final comfirm = await CustomDialog.showConfirmDialog(
+                              context: context,
+                              title: 'Xác nhận',
+                              message: 'Tắt bảo mật ứng dụng\n\n- Bỏ mật mã khi mở app'
+                          );
+                          if(comfirm){
+                            AppSecurityStorage.setAppLockEnabled(false);
+                            setState(() {
+                              _lockApp = value;
+                            });
+                          }
                         }
                       }
-                    }
-                  },
-                  activeColor: Theme.of(context).colorScheme.primary,
-                  inactiveTrackColor: Theme.of(context).colorScheme.surfaceContainerHighest
+                    },
+                    activeColor: Theme.of(context).colorScheme.primary,
+                    inactiveTrackColor: Theme.of(context).colorScheme.surfaceContainerHighest
+                ),
               ),
-            ),
 
-            if (_showForm) Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
-              child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextFormField(
-                        controller: _passController,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          labelText: 'Mã bảo mật',
+              if (_showForm) Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
+                child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextFormField(
+                          controller: _passController,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: 'Mã bảo mật',
+                          ),
+                          keyboardType: TextInputType.number,
+                          validator: (value){
+                            if(value?.trim().isEmpty == true){
+                              return "Yêu cầu Passcode";
+                            }
+                            else if(value!.length < 6){
+                              return "Yêu cầu tối thiểu 6 số";
+                            }
+                            return null;
+                          },
                         ),
-                        keyboardType: TextInputType.number,
-                        validator: (value){
-                          if(value?.trim().isEmpty == true){
-                            return "Yêu cầu Passcode";
-                          }
-                          else if(value!.length < 6){
-                            return "Yêu cầu tối thiểu 6 số";
-                          }
-                          return null;
-                        },
-                    ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        controller: _question1Controller,
-                        decoration: InputDecoration(labelText: 'Câu hỏi bảo mật 1'),
-                        validator: (value){
-                          if(value?.trim().isEmpty == true){
-                            return "Bắt buộc nhập";
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        controller: _answer1Controller,
-                        decoration: InputDecoration(labelText: 'Câu trả lời 1'),
-                        validator: (value){
-                          if(value?.trim().isEmpty == true){
-                            return "Bắt buộc nhập";
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        controller: _question2Controller,
-                        decoration: InputDecoration(labelText: 'Câu hỏi bảo mật 2'),
-                        validator: (value){
-                          if(value?.trim().isEmpty == true){
-                            return "Bắt buộc nhập";
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        controller: _answer2Controller,
-                        decoration: InputDecoration(labelText: 'Câu trả lời 2'),
-                        validator: (value){
-                          if(value?.trim().isEmpty == true){
-                            return "Bắt buộc nhập";
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 20),
-                      Divider(height: 2,),
-                      Wrap(
-                        spacing: 10,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () async {
-                              if(_formKey.currentState!.validate()){
-                                final pass = _passController.text.trim();
-                                final q1 = _question1Controller.text.trim();
-                                final a1 = _answer1Controller.text.trim();
-                                final q2 = _question2Controller.text.trim();
-                                final a2 = _answer2Controller.text.trim();
+                        SizedBox(height: 16),
+                        TextFormField(
+                          controller: _question1Controller,
+                          decoration: InputDecoration(labelText: 'Câu hỏi bảo mật 1'),
+                          validator: (value){
+                            if(value?.trim().isEmpty == true){
+                              return "Bắt buộc nhập";
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 8),
+                        TextFormField(
+                          controller: _answer1Controller,
+                          decoration: InputDecoration(labelText: 'Câu trả lời 1'),
+                          validator: (value){
+                            if(value?.trim().isEmpty == true){
+                              return "Bắt buộc nhập";
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 16),
+                        TextFormField(
+                          controller: _question2Controller,
+                          decoration: InputDecoration(labelText: 'Câu hỏi bảo mật 2'),
+                          validator: (value){
+                            if(value?.trim().isEmpty == true){
+                              return "Bắt buộc nhập";
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 8),
+                        TextFormField(
+                          controller: _answer2Controller,
+                          decoration: InputDecoration(labelText: 'Câu trả lời 2'),
+                          validator: (value){
+                            if(value?.trim().isEmpty == true){
+                              return "Bắt buộc nhập";
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 20),
+                        Divider(height: 2,),
+                        Wrap(
+                          spacing: 10,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () async {
+                                if(_formKey.currentState!.validate()){
+                                  final pass = _passController.text.trim();
+                                  final q1 = _question1Controller.text.trim();
+                                  final a1 = _answer1Controller.text.trim();
+                                  final q2 = _question2Controller.text.trim();
+                                  final a2 = _answer2Controller.text.trim();
 
-                                await AppSecurityStorage.setAppLockEnabled(true);
-                                await AppSecurityStorage.savePin(pass);
-                                await AppSecurityStorage.saveSecurityQuestions(q1, a1, q2, a2);
+                                  await AppSecurityStorage.setAppLockEnabled(true);
+                                  await AppSecurityStorage.savePin(pass);
+                                  await AppSecurityStorage.saveSecurityQuestions(q1, a1, q2, a2);
 
+                                  setState(() {
+                                    _lockApp = true;
+                                    _showForm = false;
+                                  });
+                                  CustomDialog.showMessageDialog(
+                                      context: context,
+                                      title: 'Thành công',
+                                      message: 'Bảo mật đã được bật');
+                                }
+                              },
+                              child: Text('Xác nhận'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
                                 setState(() {
-                                  _lockApp = true;
+                                  _lockApp = false;
                                   _showForm = false;
                                 });
-                                CustomDialog.showMessageDialog(
-                                    context: context,
-                                    title: 'Thành công',
-                                    message: 'Bảo mật đã được bật');
-                              }
-                            },
-                            child: Text('Xác nhận'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              setState(() {
-                                _lockApp = false;
-                                _showForm = false;
-                              });
-                            },
-                            child: Text('Hủy'),
-                          ),
-                        ],
-                      )
-                    ],
-                  )
+                              },
+                              child: Text('Hủy'),
+                            ),
+                          ],
+                        )
+                      ],
+                    )
+                ),
               ),
-            ),
 
-            Padding(
-              padding: EdgeInsets.only(left: 28),
-              child: SwitchListTile(
-                  title: Text('Bảo mật nhật ký',),
-                  value: _lockMood,
-                  onChanged: (bool value) async {
-                    if(value){
-                      setState(() {
-                        _showFormMood = true;
-                      });
-                    }
-                    else{
-                      final unLocked = await Navigator.push<bool>(
-                        context,
-                        MaterialPageRoute(builder: (_) => PinAuthScreen(type: AuthType.mood)),
-                      );
-                      if(unLocked == true){
-                        final comfirm = await CustomDialog.showConfirmDialog(
-                            context: context,
-                            title: 'Xác nhận',
-                            message: 'Tắt bảo mật nhật ký\n\n- Bỏ mật mã khi truy cập nhật ký'
+              Padding(
+                padding: EdgeInsets.only(left: 28),
+                child: SwitchListTile(
+                    title: Text('Bảo mật nhật ký',),
+                    value: _lockMood,
+                    onChanged: (bool value) async {
+                      if(value){
+                        setState(() {
+                          _showFormMood = true;
+                        });
+                      }
+                      else{
+                        final unLocked = await Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(builder: (_) => PinAuthScreen(type: AuthType.mood)),
                         );
-                        if(comfirm){
-                          AppSecurityStorage.setMoodLockEnabled(false);
-                          setState(() {
-                            _lockMood = value;
-                          });
+                        if(unLocked == true){
+                          final comfirm = await CustomDialog.showConfirmDialog(
+                              context: context,
+                              title: 'Xác nhận',
+                              message: 'Tắt bảo mật nhật ký\n\n- Bỏ mật mã khi truy cập nhật ký'
+                          );
+                          if(comfirm){
+                            AppSecurityStorage.setMoodLockEnabled(false);
+                            setState(() {
+                              _lockMood = value;
+                            });
+                          }
                         }
                       }
-                    }
-                  },
-                  activeColor: Theme.of(context).colorScheme.primary,
-                  inactiveTrackColor: Theme.of(context).colorScheme.surfaceContainerHighest
+                    },
+                    activeColor: Theme.of(context).colorScheme.primary,
+                    inactiveTrackColor: Theme.of(context).colorScheme.surfaceContainerHighest
+                ),
               ),
-            ),
 
-            if (_showFormMood) Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
+              if (_showFormMood) Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
                 child: Form(
                     key: _formKeyM,
                     child: Column(
@@ -366,122 +368,123 @@ class _SecurityScreen extends State<SecurityScreen>{
                       ],
                     )
                 ),
-            ),
-
-            Padding(
-              padding: EdgeInsets.only(left: 28),
-              child: ElevatedButton(
-                  onPressed: (_lockApp || _lockMood) ? ()async{
-                    if(_lockApp || _lockMood){
-                      setState(() {
-                        _showFormReset = true;
-                      });
-
-                    }
-                  } : null,
-                  child: Text('Xóa bảo mật')
               ),
-            ),
 
-            if (_showFormReset) Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
-              child: Form(
-                  key: _formKeyReset,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextFormField(
-                        controller: _passControllerReset,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          labelText: 'Mã bảo mật ỨNG DỤNG',
+              Padding(
+                padding: EdgeInsets.only(left: 28),
+                child: ElevatedButton(
+                    onPressed: (_lockApp || _lockMood) ? ()async{
+                      if(_lockApp || _lockMood){
+                        setState(() {
+                          _showFormReset = true;
+                        });
+
+                      }
+                    } : null,
+                    child: Text('Xóa bảo mật')
+                ),
+              ),
+
+              if (_showFormReset) Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
+                child: Form(
+                    key: _formKeyReset,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextFormField(
+                          controller: _passControllerReset,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: 'Mã bảo mật ỨNG DỤNG',
+                          ),
+                          keyboardType: TextInputType.number,
+                          validator: (value){
+                            if(value?.trim().isEmpty == true){
+                              return "Yêu cầu mật mã";
+                            }
+                            return null;
+                          },
                         ),
-                        keyboardType: TextInputType.number,
-                        validator: (value){
-                          if(value?.trim().isEmpty == true){
-                            return "Yêu cầu mật mã";
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        controller: _passControllerMoodReset,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          labelText: 'Mã bảo mật NHẬT KÝ',
+                        SizedBox(height: 16),
+                        TextFormField(
+                          controller: _passControllerMoodReset,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: 'Mã bảo mật NHẬT KÝ',
+                          ),
+                          keyboardType: TextInputType.number,
+                          validator: (value){
+                            if(value?.trim().isEmpty == true){
+                              return "Yêu cầu mật mã";
+                            }
+                            return null;
+                          },
                         ),
-                        keyboardType: TextInputType.number,
-                        validator: (value){
-                          if(value?.trim().isEmpty == true){
-                            return "Yêu cầu mật mã";
-                          }
-                          return null;
-                        },
-                      ),
-                      Wrap(
-                        spacing: 10,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () async {
-                              if(_formKeyReset.currentState!.validate()){
-                                final passApp = _passControllerReset.text.trim();
-                                final passMood = _passControllerMoodReset.text.trim();
+                        Wrap(
+                          spacing: 10,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () async {
+                                if(_formKeyReset.currentState!.validate()){
+                                  final passApp = _passControllerReset.text.trim();
+                                  final passMood = _passControllerMoodReset.text.trim();
 
-                                final rsApp = await AppSecurityStorage.verifyPin(passApp);
-                                final rsMood = await AppSecurityStorage.verifyPinM(passMood);
+                                  final rsApp = await AppSecurityStorage.verifyPin(passApp);
+                                  final rsMood = await AppSecurityStorage.verifyPinM(passMood);
 
-                                if(rsApp&&rsMood){
-                                  final comfirm = await CustomDialog.showConfirmDialog(
-                                      context: context,
-                                      title: 'Xác nhận',
-                                      message: 'Hành động sẽ loại bỏ tất cả các bảo mật hiện tại'
-                                  );
-                                  if(comfirm){
-                                    await AppSecurityStorage.resetAll();
-                                    await CustomDialog.showConfirmDialog(
+                                  if(rsApp&&rsMood){
+                                    final comfirm = await CustomDialog.showConfirmDialog(
                                         context: context,
-                                        title: 'Thông báo',
-                                        message: 'Đã hủy các bảo mật hiện tại'
+                                        title: 'Xác nhận',
+                                        message: 'Hành động sẽ loại bỏ tất cả các bảo mật hiện tại'
                                     );
-                                    setState(() {
-                                      _lockApp = false;
-                                      _lockMood = false;
-                                      _showForm = false;
-                                      _showFormMood = false;
-                                      _showFormReset = false;
-                                    });
+                                    if(comfirm){
+                                      await AppSecurityStorage.resetAll();
+                                      await CustomDialog.showConfirmDialog(
+                                          context: context,
+                                          title: 'Thông báo',
+                                          message: 'Đã hủy các bảo mật hiện tại'
+                                      );
+                                      setState(() {
+                                        _lockApp = false;
+                                        _lockMood = false;
+                                        _showForm = false;
+                                        _showFormMood = false;
+                                        _showFormReset = false;
+                                      });
+                                    }
+                                  }
+                                  else{
+                                    await CustomDialog.showMessageDialog(
+                                        context: context,
+                                        title: 'Lỗi',
+                                        message: 'Xác thực không thành công'
+                                    );
                                   }
                                 }
-                                else{
-                                  await CustomDialog.showMessageDialog(
-                                      context: context,
-                                      title: 'Lỗi',
-                                      message: 'Xác thực không thành công'
-                                  );
-                                }
-                              }
-                            },
-                            child: Text('Xác nhận'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              setState(() {
-                                _showFormReset = false;
-                              });
-                            },
-                            child: Text('Hủy'),
-                          ),
-                        ],
-                      )
-                    ],
-                  )
+                              },
+                              child: Text('Xác nhận'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                setState(() {
+                                  _showFormReset = false;
+                                });
+                              },
+                              child: Text('Hủy'),
+                            ),
+                          ],
+                        )
+                      ],
+                    )
+                ),
               ),
-            ),
-            Divider(height: 5,),
-            _buildAbout(context),
-          ],
+              Divider(height: 5,),
+              _buildAbout(context),
+            ],
+          ),
         ),
       ),
     );

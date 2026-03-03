@@ -35,7 +35,9 @@ class _EditHabitScreen extends ConsumerState<EditHabitScreen>{
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(
+        top: false,
+        child: Scaffold(
       appBar: AppBar(title: Text('Thêm nhiệm vụ'),),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -72,15 +74,15 @@ class _EditHabitScreen extends ConsumerState<EditHabitScreen>{
                     if(_formKey.currentState!.validate()){
                       if(_name.text.trim().toLowerCase() != widget.h.name.trim().toLowerCase())
                       {
-                          final isDuplicate = ref.read(habitListProvider.notifier).checkName(_name.text);
-                          if (isDuplicate) {
-                            await CustomDialog.showMessageDialog(
-                                context: context,
-                                title: 'Lỗi!',
-                                message: 'Tên nhiệm vụ đã tồn tại. Hãy nhập tên khác'
-                            );
-                            return;
-                          }
+                        final isDuplicate = ref.read(habitListProvider.notifier).checkName(_name.text);
+                        if (isDuplicate) {
+                          await CustomDialog.showMessageDialog(
+                              context: context,
+                              title: 'Lỗi!',
+                              message: 'Tên nhiệm vụ đã tồn tại. Hãy nhập tên khác'
+                          );
+                          return;
+                        }
                       }
                       if(_repeatDays.isEmpty){
                         await CustomDialog.showMessageDialog(
@@ -108,6 +110,7 @@ class _EditHabitScreen extends ConsumerState<EditHabitScreen>{
           ),
         ),
       ),
+    )
     );
   }
 

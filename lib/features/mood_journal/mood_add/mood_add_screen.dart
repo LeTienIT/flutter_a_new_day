@@ -39,7 +39,9 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
   @override
   Widget build(BuildContext context) {
     final emojiAsync = ref.watch(emojisNotifierProvider);
-    return Scaffold(
+    return SafeArea(
+      top: false,
+        child: Scaffold(
       appBar: AppBar(title: const Text('Ghi lại cảm xúc hôm nay')),
       body: emojiAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -142,7 +144,7 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
                       if(path!=null){
                         videoPath = path;
                       }
-                }),
+                    }),
 
                 const SizedBox(height: 30),
 
@@ -192,6 +194,7 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
         },
       ),
       resizeToAvoidBottomInset: true,
+    )
     );
   }
 }

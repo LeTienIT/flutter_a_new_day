@@ -5,10 +5,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:math';
+import 'package:path/path.dart' as p;
 
 enum AuthType {
   app,
   mood,
+}
+
+int getDaysInMonth(int year, int month) {
+  return DateTime(year, month + 1, 0).day;
 }
 
 String formatVietnameseDate(DateTime date) {
@@ -129,3 +134,26 @@ String formatBytes(int bytes, [int decimals = 2]) {
   return '${(bytes / pow(1024, i)).toStringAsFixed(decimals)} ${sizes[i]}';
 }
 
+Future<String?> resolveFilePath(String? storedPath) async {
+  if (storedPath == null || storedPath.isEmpty) return null;
+
+  final originalFile = File(storedPath);
+
+  if (await originalFile.exists()) {
+    return storedPath;
+  }
+
+  final fileName = p.basename(storedPath);
+
+  final dir = await getApplicationDocumentsDirectory() ;
+
+  final newPath = p.join(dir.path, fileName);
+
+  final newFile = File(newPath);
+
+  if (await newFile.exists()) {
+    return newPath;
+  }
+
+  return null;
+}

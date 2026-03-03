@@ -25,74 +25,77 @@ class _AddHabitScreen extends ConsumerState<AddHabitScreen>{
   String? iconPath = '';
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(
+        top: false,
+        child: Scaffold(
       appBar: AppBar(title: Text('Thêm nhiệm vụ'),),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SessionTitle(title: 'Tên nhiệm vụ',subtitle: 'không được trùng',required: true,),
-                TextForm(category: _name, title: 'Tên', hint: 'VD: Thể dục'),
-                
-                SessionTitle(title: 'Các ngày cần thực hiện'),
-                RepeatDaysSelector(
-                  initialDays: _repeatDays,
-                  onChanged: (newDays) {
-                    setState(() {
-                      _repeatDays = newDays;
-                    });
-                  },
-                ),
-                SessionTitle(title: 'Biểu tượng tùy chỉnh'),
-                IconInput(
-                  initialIconPath: '',
-                  onIconPicked: (path) {
-                    if(path!=null){
-                      iconPath = path;
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SessionTitle(title: 'Tên nhiệm vụ',subtitle: 'không được trùng',required: true,),
+              TextForm(category: _name, title: 'Tên', hint: 'VD: Thể dục'),
+
+              SessionTitle(title: 'Các ngày cần thực hiện'),
+              RepeatDaysSelector(
+                initialDays: _repeatDays,
+                onChanged: (newDays) {
+                  setState(() {
+                    _repeatDays = newDays;
+                  });
+                },
+              ),
+              SessionTitle(title: 'Biểu tượng tùy chỉnh'),
+              IconInput(
+                initialIconPath: '',
+                onIconPicked: (path) {
+                  if(path!=null){
+                    iconPath = path;
+                  }
+                },
+              ),
+
+              Divider(thickness: 1,),
+              FilledButton(
+                  onPressed: () async {
+                    if(_formKey.currentState!.validate()){
+                      final isDuplicate = ref.read(habitListProvider.notifier).checkName(_name.text);
+                      if (isDuplicate) {
+                        await CustomDialog.showMessageDialog(
+                            context: context,
+                            title: 'Lỗi!',
+                            message: 'Tên nhiệm vụ đã tồn tại. Hãy nhập tên khác'
+                        );
+                        return;
+                      }
+                      if(_repeatDays.isEmpty){
+                        await CustomDialog.showMessageDialog(
+                            context: context,
+                            title: 'Lỗi!',
+                            message: 'Chọn ít nhất 1 ngày thực hiện'
+                        );
+                        return;
+                      }
+                      HabitModel h = HabitModel(
+                          name: _name.text,
+                          repeatDays: _repeatDays,
+                          icon: iconPath,
+                          createdAt: DateTime.now()
+                      );
+                      await ref.read(habitListProvider.notifier).insertHabit(h);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Đã thêm')));
                     }
                   },
-                ),
-
-                Divider(thickness: 1,),
-                FilledButton(
-                    onPressed: () async {
-                      if(_formKey.currentState!.validate()){
-                        final isDuplicate = ref.read(habitListProvider.notifier).checkName(_name.text);
-                        if (isDuplicate) {
-                          await CustomDialog.showMessageDialog(
-                              context: context,
-                              title: 'Lỗi!',
-                              message: 'Tên nhiệm vụ đã tồn tại. Hãy nhập tên khác'
-                          );
-                          return;
-                        }
-                        if(_repeatDays.isEmpty){
-                          await CustomDialog.showMessageDialog(
-                              context: context,
-                              title: 'Lỗi!',
-                              message: 'Chọn ít nhất 1 ngày thực hiện'
-                          );
-                          return;
-                        }
-                        HabitModel h = HabitModel(
-                            name: _name.text,
-                            repeatDays: _repeatDays,
-                            icon: iconPath,
-                            createdAt: DateTime.now()
-                        );
-                        await ref.read(habitListProvider.notifier).insertHabit(h);
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Đã thêm')));
-                      }
-                    },
-                    child: Text('Thêm')
-                )
-              ],
-            ),
+                  child: Text('Thêm')
+              )
+            ],
+          ),
         ),
       ),
+    )
     );
   }
 

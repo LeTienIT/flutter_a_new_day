@@ -11,6 +11,7 @@ import 'package:a_new_day/features/habit/screen/habit_home/habit_home_screen.dar
 import 'package:a_new_day/features/habit/screen/habit_list/habit_list_screen.dart';
 import 'package:a_new_day/features/habit/screen/habit_list/habit_status_list_screen.dart';
 import 'package:a_new_day/features/menu/menu.dart';
+import 'package:a_new_day/features/mood_journal/mood_book/mood_book_screen.dart';
 import 'package:a_new_day/features/mood_journal/mood_list/mood_list_screen.dart';
 import 'package:a_new_day/features/mood_journal/mood_view/mood_view_screen.dart';
 import 'package:a_new_day/features/security/authen_screen.dart';
@@ -103,6 +104,9 @@ class _MyAppState extends ConsumerState<MyApp> {
               return MaterialPageRoute(builder: (_) => DashboardScreen());
             case '/backup':
               return MaterialPageRoute(builder: (_) => BackupScreen());
+            case '/mood-book':
+              final listMood = settings.arguments as List<MoodModel>;
+              return MaterialPageRoute(builder: (_) => MoodBookScreen(listMood));
             default:
               return MaterialPageRoute(builder: (_) => Scaffold(appBar: AppBar(title: Text('Lỗi')),drawer: Drawer(child: Menu(),),body: Center(child: Text('Không tìm thấy trang! Lỗi!'),),));
           }

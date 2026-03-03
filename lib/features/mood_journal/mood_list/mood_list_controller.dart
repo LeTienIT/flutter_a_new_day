@@ -6,23 +6,51 @@ import 'package:a_new_day/data/database/dao/mood_dao.dart';
 import 'package:a_new_day/data/models/mood_model.dart';
 import 'package:a_new_day/features/mood_journal/mood_list/mood_list_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import '../../../data/database/providers/database_providers.dart';
 
 final moodFilterProvider = StateProvider<DateTime?>((ref) => null);
 
+final moodYearProvider = StateProvider<int>((ref) => -1);
+final moodMonthProvider = StateProvider<int?>((ref) => null);
+final moodDayProvider = StateProvider<int?>((ref) => null);
+
 final filteredMoodListProvider = Provider<List<MoodModel>>((ref) {
   final state = ref.watch(moodListProvider);
-  final filterDate = ref.watch(moodFilterProvider);
+
+  final selectedYear = ref.watch(moodYearProvider);
+  final selectedMonth = ref.watch(moodMonthProvider);
+  final selectedDay = ref.watch(moodDayProvider);
 
   if (state is! MoodListData) return [];
 
-  if (filterDate == null) return state.listData;
+  final now = DateTime.now();
+
+  int? effectiveYear = selectedYear == -1 ? null : selectedYear;
+
+  int? effectiveMonth = selectedMonth;
+  int? effectiveDay = selectedDay;
+
+  if (selectedYear == -1 && selectedMonth == null && selectedDay != null) {
+    effectiveYear = now.year;
+    effectiveMonth = now.month;
+  }
+
+  if (effectiveYear == null && effectiveMonth == null && effectiveDay == null) {
+    return state.listData;
+  }
 
   return state.listData.where((mood) {
-    return mood.date.year == filterDate.year &&
-        mood.date.month == filterDate.month &&
-        mood.date.day == filterDate.day;
+    final date = mood.date;
+
+    if (effectiveYear != null && date.year != effectiveYear) return false;
+
+    if (effectiveMonth != null && date.month != effectiveMonth) return false;
+
+    if (effectiveDay != null && date.day != effectiveDay) return false;
+
+    return true;
   }).toList();
 });
 
@@ -133,7 +161,7 @@ class MoodListController extends Notifier<MoodListState>{
       if (m.image?.isNotEmpty == true) {
         final original = File(m.image!);
         final saved = await imageUtil.compressAndSaveImage(original);
-        m.image = saved?.path;
+        m.image = p.basename(saved!.path);
       }
     }
 

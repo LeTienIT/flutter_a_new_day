@@ -22,70 +22,72 @@ class MoodHomeScreen extends ConsumerWidget {
     final controller = ref.watch(moodListProvider.notifier);
     MoodModel? mCurrent = controller.getToDay()!.isEmpty ? null : controller.getToDay()!.first;
     // print(mCurrent.toString());
-    return Scaffold(
-      appBar: mCurrent == null ? AppBar(
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        appBar: mCurrent == null ? AppBar(
           title: Text(
             formatVietnameseDate(DateTime.now()),
             style: const TextStyle(fontSize: 16),
           ),
         )
-          : null,
-      drawer: Drawer(child: mCurrent == null ? Menu() : null,),
-      body: switch (state) {
-        MoodListLoading() => const Center(child: CircularProgressIndicator()),
+            : null,
+        drawer: Drawer(child: mCurrent == null ? Menu() : null,),
+        body: switch (state) {
+          MoodListLoading() => const Center(child: CircularProgressIndicator()),
 
-        MoodListData() => (mCurrent==null) ?
-        Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFa8edea), Color(0xFFfed6e3)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+          MoodListData() => (mCurrent==null) ?
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFa8edea), Color(0xFFfed6e3)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
-          ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.sentiment_satisfied_alt, size: 40, color: Colors.orange),
-                    SizedBox(width: 10),
-                    Text(
-                      'Hôm nay bạn thế nào?',
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                TweenAnimationBuilder<double>(
-                  tween: Tween(begin: 0, end: 1),
-                  duration: const Duration(milliseconds: 800),
-                  builder: (context, value, child) => Opacity(
-                    opacity: value,
-                    child: child,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.sentiment_satisfied_alt, size: 40, color: Colors.orange),
+                      SizedBox(width: 10),
+                      Text(
+                        'Hôm nay bạn thế nào?',
+                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shadowColor: Colors.deepPurpleAccent,
-                      elevation: 8,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  const SizedBox(height: 20),
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0, end: 1),
+                    duration: const Duration(milliseconds: 800),
+                    builder: (context, value, child) => Opacity(
+                      opacity: value,
+                      child: child,
                     ),
-                    onPressed: () {Navigator.pushNamed(context, '/mood-add');},
-                    child: const Text(
-                      'Lưu giữ lại ký ức hôm nay chứ?',
-                      style: TextStyle(fontSize: 16),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shadowColor: Colors.deepPurpleAccent,
+                        elevation: 8,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () {Navigator.pushNamed(context, '/mood-add');},
+                      child: const Text(
+                        'Lưu giữ lại ký ức hôm nay chứ?',
+                        style: TextStyle(fontSize: 16),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        )
-        : Center(
+          )
+              : Center(
             child: PageFlipWidget(
               key: _controller,
               backgroundColor: const Color(0xFFFBF6EF), // Màu giấy ngà
@@ -97,22 +99,23 @@ class MoodHomeScreen extends ConsumerWidget {
                   _buildImageAudio(context, mCurrent.image, mCurrent.audio, mCurrent.video)
               ],
             ),
-        ),
-
-        MoodListError() => const Center(child: Text("Lỗi tải dữ liệu")),
-        _ => const SizedBox(),
-      },
-      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-      floatingActionButton: Transform.translate(
-        offset: const Offset(-5, 5),
-        child: FloatingActionButton(
-          mini: true,
-          onPressed: () => Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/mood-list',
-                (route) => false,
           ),
-          child: const Icon(Icons.list, size: 16),
+
+          MoodListError() => const Center(child: Text("Lỗi tải dữ liệu")),
+          _ => const SizedBox(),
+        },
+        floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+        floatingActionButton: Transform.translate(
+          offset: const Offset(-5, 5),
+          child: FloatingActionButton(
+            mini: true,
+            onPressed: () => Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/mood-list',
+                  (route) => false,
+            ),
+            child: const Icon(Icons.list, size: 16),
+          ),
         ),
       ),
     );

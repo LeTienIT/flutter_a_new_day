@@ -24,23 +24,26 @@ class HabitStatusDetailScreen extends ConsumerWidget{
     }
     final habits = habitState.listData;
     final dao = ref.read(habitDaoProvider);
-    return FutureBuilder<List<HabitStatusModel>>(
-      future: dao.getHabitStatusesByDate(date),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
 
-        final statuses = snapshot.data!;
-        final completed = statuses.where((s) => s.completed).length;
-        final total = statuses.length;
-        final percent = (completed / total * 100).toStringAsFixed(0);
-        return Scaffold(
-          appBar: AppBar(title: Text(formatVietnameseDate(date))),
-          body: statuses.isEmpty
-              ? const Center(child: Text("Không có dữ liệu cho ngày này")) :
+    return SafeArea(
+      top: false,
+      child: FutureBuilder<List<HabitStatusModel>>(
+        future: dao.getHabitStatusesByDate(date),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          final statuses = snapshot.data!;
+          final completed = statuses.where((s) => s.completed).length;
+          final total = statuses.length;
+          final percent = (completed / total * 100).toStringAsFixed(0);
+          return Scaffold(
+            appBar: AppBar(title: Text(formatVietnameseDate(date))),
+            body: statuses.isEmpty
+                ? const Center(child: Text("Không có dữ liệu cho ngày này")) :
             Column(
               children: [
                 Padding(
@@ -141,8 +144,9 @@ class HabitStatusDetailScreen extends ConsumerWidget{
                 )),
               ],
             ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
