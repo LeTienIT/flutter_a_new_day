@@ -81,7 +81,7 @@ class _FullScreenImagePageState extends State<FullScreenImagePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ảnh full màn hình'),
+        title: Text('Ảnh'),
         actions: [
           IconButton(
             icon: _isSaving ? SizedBox(

@@ -23,6 +23,7 @@ Future<void> saveLargeBackup(File zipFile) async {
   try {
     await platform.invokeMethod('openSafAndSave', {
       'srcPath': zipFile.path,
+      "fileName": "backup_${DateTime.now().millisecondsSinceEpoch}.zip"
     });
   } on PlatformException catch (e) {
     throw Exception("Lỗi khi lưu backup: ${e.message}");

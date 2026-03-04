@@ -3,12 +3,14 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../core/utils/tool.dart';
+import '../../backup/backup_controller.dart' as FilePicker;
 
 class AudioRecorderWidget extends StatefulWidget {
   late String? initialAudioPath;
@@ -154,87 +156,122 @@ class _AudioRecorderWidgetState extends State<AudioRecorderWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (_currentAudioPath == null && widget.initialAudioPath == null && !_isRecording && widget.enableEdit)
-              Text(
-                'Âm thanh của trái tim',
-                style: Theme.of(context).textTheme.titleMedium,
-              )
-            else if ((_currentAudioPath != null || widget.initialAudioPath != null) && !_isRecording)
-              Text(
-                '${_currentAudioPath != null ? _currentAudioPath?.split('/').last : 'Không có file'}',
-                style: Theme.of(context).textTheme.titleMedium,
-              )
-            else if (_isRecording)
-                Text(
-                  'Đang ghi âm... ${formatDuration(_recordDuration)}',
-                  style: TextStyle(color: Colors.red),
-                )
-              else
-                const Text('Chưa có bản ghi âm'),
+    final hasAudio = _currentAudioPath != null || widget.initialAudioPath != null;
 
-            if (_isPlaying || _currentPosition > Duration.zero)
-              Text(
-                '${formatDuration(_currentPosition)} / ${formatDuration(_totalDuration)}',
-                style: const TextStyle(fontSize: 14),
-              ),
-            const SizedBox(height: 16),
-
-            // Nút điều khiển
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+    return Stack(
+      children: [
+        Card(
+          elevation: 4,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                // Nút ghi âm/dừng
-                if(!_isPlaying && widget.enableEdit)
-                  IconButton(
-                    icon: Icon(_isRecording ? Icons.stop : Icons.mic),
-                    color: _isRecording ? Colors.red : Colors.blue,
-                    onPressed: () {
-                      if (_isRecording) {
-                        _stopRecording();
-                      } else {
-                        _startRecording();
-                      }
-                    },
-                  ),
+                if (_currentAudioPath == null && widget.initialAudioPath == null && !_isRecording && widget.enableEdit)
+                  Text(
+                    'Âm thanh của trái tim',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  )
+                else if ((_currentAudioPath != null || widget.initialAudioPath != null) && !_isRecording)
+                  Text(
+                    '${_currentAudioPath != null ? _currentAudioPath?.split('/').last : 'Không có file'}',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  )
+                else if (_isRecording)
+                    Text(
+                      'Đang ghi âm... ${formatDuration(_recordDuration)}',
+                      style: TextStyle(color: Colors.red),
+                    )
+                  else
+                    const Text('Chưa có bản ghi âm'),
 
-                // Nút phát/dừng (chỉ hiện khi có audio)
-                if ((_currentAudioPath != null || widget.initialAudioPath != null) && !_isRecording)
-                  IconButton(
-                    icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
-                    color: Colors.green,
-                    onPressed: () {
-                      if (_isPlaying) {
-                        _stopPlaying();
-                      } else {
-                        _playAudio();
-                      }
-                    },
+                if (_isPlaying || _currentPosition > Duration.zero)
+                  Text(
+                    '${formatDuration(_currentPosition)} / ${formatDuration(_totalDuration)}',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                const SizedBox(height: 16),
+
+                // Nút điều khiển
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Nút ghi âm/dừng
+                    if(!_isPlaying && widget.enableEdit)
+                      IconButton(
+                        icon: Icon(_isRecording ? Icons.stop : Icons.mic),
+                        color: _isRecording ? Colors.red : Colors.blue,
+                        onPressed: () {
+                          if (_isRecording) {
+                            _stopRecording();
+                          } else {
+                            _startRecording();
+                          }
+                        },
+                      ),
+
+                    // Nút phát/dừng (chỉ hiện khi có audio)
+                    if ((_currentAudioPath != null || widget.initialAudioPath != null) && !_isRecording)
+                      IconButton(
+                        icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
+                        color: Colors.green,
+                        onPressed: () {
+                          if (_isPlaying) {
+                            _stopPlaying();
+                          } else {
+                            _playAudio();
+                          }
+                        },
+                      ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                if ((_currentAudioPath != null || _isRecording) && widget.enableEdit)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: _isRecording ? null : _deleteAudio,
+                        child: const Text('Xóa file'),
+                      ),
+                    ],
                   ),
               ],
             ),
-
-            const SizedBox(height: 16),
-
-            if ((_currentAudioPath != null || _isRecording) && widget.enableEdit)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton(
-                    onPressed: _isRecording ? null : _deleteAudio,
-                    child: const Text('Xóa file'),
-                  ),
-                ],
-              ),
-          ],
+          ),
         ),
-      ),
+        if (!widget.enableEdit && hasAudio)
+          Positioned(
+            bottom: 8,
+            right: 8,
+            child: IconButton(
+              icon: const Icon(Icons.download),
+              color: Colors.blue,
+              onPressed: _downloadAudio,
+            ),
+          ),
+      ],
     );
+  }
+
+  Future<void> _downloadAudio() async {
+    final sourcePath = _currentAudioPath ?? widget.initialAudioPath;
+
+    if (sourcePath == null) return;
+
+    const platform = MethodChannel('letienit.a_new_day.saf');
+
+    try {
+      final fileName = sourcePath.split('/').last;
+
+      await platform.invokeMethod('openSafAndSave', {
+        'srcPath': sourcePath,
+        "fileName": fileName
+      });
+    } on PlatformException catch (e) {
+      throw Exception("Lỗi khi lưu file: ${e.message}");
+    }
   }
 }

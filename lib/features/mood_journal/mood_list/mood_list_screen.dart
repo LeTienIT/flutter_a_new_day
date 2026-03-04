@@ -38,7 +38,15 @@ class MoodListScreen extends ConsumerWidget{
           children: [
             SpeedDialChild(
               child: const Icon(Icons.menu_book),
-              label: 'Tạo sách',
+              label: 'Ảnh/Video',
+              onTap: () {
+                final data = filteredList.reversed.toList();
+                Navigator.pushNamed(context, '/mood-media', arguments: data);
+              },
+            ),
+            SpeedDialChild(
+              child: const Icon(Icons.menu_book),
+              label: 'Quyển sách',
               onTap: () {
                 final data = filteredList.reversed.toList();
                 Navigator.pushNamed(context, '/mood-book', arguments: data);

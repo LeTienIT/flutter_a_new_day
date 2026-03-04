@@ -24,6 +24,7 @@ import 'features/mood_journal/emoji_repository.dart';
 import 'features/mood_journal/mood_add/mood_add_screen.dart';
 import 'features/mood_journal/mood_edit/mood_edit_screen.dart';
 import 'features/mood_journal/mood_home/mood_home_screen.dart';
+import 'features/mood_journal/mood_media/mood_media_page.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -107,6 +108,9 @@ class _MyAppState extends ConsumerState<MyApp> {
             case '/mood-book':
               final listMood = settings.arguments as List<MoodModel>;
               return MaterialPageRoute(builder: (_) => MoodBookScreen(listMood));
+            case '/mood-media':
+              final listMood = settings.arguments as List<MoodModel>;
+              return MaterialPageRoute(builder: (_) => MoodMediaPage(listMood));
             default:
               return MaterialPageRoute(builder: (_) => Scaffold(appBar: AppBar(title: Text('Lỗi')),drawer: Drawer(child: Menu(),),body: Center(child: Text('Không tìm thấy trang! Lỗi!'),),));
           }

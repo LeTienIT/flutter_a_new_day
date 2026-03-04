@@ -22,16 +22,27 @@ import UniformTypeIdentifiers
     ) -> Bool {
 
         let controller = window?.rootViewController as! FlutterViewController
-        let channel = FlutterMethodChannel(name: "letienit.a_new_day.saf", binaryMessenger: controller.binaryMessenger)
 
-        channel.setMethodCallHandler { [weak self] (call, result) in
-            if call.method == "saveLargeFile" {
-                if let args = call.arguments as? [String: Any],
-                   let srcPath = args["srcPath"] as? String {
-                    self?.srcPathToCopy = srcPath
-                    self?.openDocumentPicker()
+        let channel = FlutterMethodChannel(
+            name: "letienit.a_new_day.saf",
+            binaryMessenger: controller.binaryMessenger
+        )
+
+        channel.setMethodCallHandler { [weak self] call, result in
+
+            if call.method == "openSafAndSave" {
+
+                guard let args = call.arguments as? [String: Any],
+                      let srcPath = args["srcPath"] as? String else {
+                    result(FlutterError(code: "INVALID_ARGS", message: "srcPath missing", details: nil))
+                    return
                 }
-                result(nil)
+
+                self?.srcPathToCopy = srcPath
+                self?.openDocumentPicker(controller: controller)
+
+                result(true)
+
             } else {
                 result(FlutterMethodNotImplemented)
             }
@@ -41,10 +52,20 @@ import UniformTypeIdentifiers
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
-    func openDocumentPicker() {
-        let documentPicker = UIDocumentPickerViewController(forExporting: [URL(fileURLWithPath: srcPathToCopy!)])
-        documentPicker.delegate = self
-        documentPicker.modalPresentationStyle = .formSheet
-        window?.rootViewController?.present(documentPicker, animated: true, completion: nil)
+    func openDocumentPicker(controller: FlutterViewController) {
+
+        guard let srcPath = srcPathToCopy else { return }
+
+        let fileURL = URL(fileURLWithPath: srcPath)
+
+        let picker = UIDocumentPickerViewController(
+            forExporting: [fileURL],
+            asCopy: true
+        )
+
+        picker.delegate = self
+        picker.modalPresentationStyle = .formSheet
+
+        controller.present(picker, animated: true)
     }
 }

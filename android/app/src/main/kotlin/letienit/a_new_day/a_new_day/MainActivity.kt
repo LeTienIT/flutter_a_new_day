@@ -49,10 +49,13 @@ class MainActivity : FlutterFragmentActivity() {
                 if (call.method == "openSafAndSave") {
                     pendingSrcPath = call.argument<String>("srcPath")!!
                     pendingResult = result
+
+                    val fileName = call.argument<String>("fileName") ?: "backup.zip"
+
                     val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                         addCategory(Intent.CATEGORY_OPENABLE)
                         type = "application/zip"
-                        putExtra(Intent.EXTRA_TITLE, "backup.zip")
+                        putExtra(Intent.EXTRA_TITLE, fileName)
                     }
                     startActivityForResult(intent, CREATE_FILE_REQUEST_CODE)
                 }
