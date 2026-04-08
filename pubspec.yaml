@@ -3,7 +3,7 @@ description: "Ứng dụng theo dõi thói quen, cảm xúc và nhật ký hắn
 
 publish_to: 'none'
 
-version: 4.6.1+32
+version: 4.6.1+33
 
 environment:
   sdk: ^3.7.2
@@ -49,6 +49,9 @@ dependencies:
 
   image_gallery_saver_plus: ^4.0.1
   flutter_cache_manager: ^3.4.1
+  uuid: ^4.4.0
+  rxdart: ^0.27.7
+  flutter_colorpicker: ^1.0.3
 
   archive: ^4.0.7
 #  file_saver: ^0.3.1

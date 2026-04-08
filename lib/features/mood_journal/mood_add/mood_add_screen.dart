@@ -179,7 +179,6 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
                         audio: _savedAudioPath ?? null,
                         video: videoPath ?? null,
                       );
-                      // print(newMood.toString());
                       await ref.read(moodListProvider.notifier).insertMood(newMood);
 
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nhật ký đã được lưu trữ')));

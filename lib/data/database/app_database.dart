@@ -1,11 +1,15 @@
 import 'dart:io';
 import 'package:a_new_day/data/database/dao/emoji_dao.dart';
+import 'package:a_new_day/data/database/dao/setting_dao.dart';
 import 'package:a_new_day/data/database/tables/emoji_table.dart';
+import 'package:a_new_day/data/database/tables/file_icon_table.dart';
+import 'package:a_new_day/data/database/tables/setting_table.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'dao/file_icon_dao.dart';
 import 'dao/mood_dao.dart';
 import 'tables/habit_table.dart';
 import 'tables/habit_status_table.dart';
@@ -15,14 +19,14 @@ import 'dao/habit_dao.dart'; // nếu có DAO
 part 'app_database.g.dart'; // Phải có để Drift sinh mã
 
 @DriftDatabase(
-  tables: [Habits, HabitStatus, Moods, EmojiTable],
-  daos: [HabitDAO, MoodDAO]
+  tables: [Habits, HabitStatus, Moods, EmojiTable, Settings, FileIcons],
+  daos: [HabitDAO, MoodDAO, SettingDao, FileIconDao]
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnect());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -43,12 +47,20 @@ class AppDatabase extends _$AppDatabase {
         await delete(emojiTable).go();
         await _insertDefaultEmojis();
       }
+      if (from <= 5) {
+        await m.createTable(settings);
+      }
+      if (from <= 6) {
+        await m.createTable(fileIcons);
+      }
     },
   );
 
   late final habitDao = HabitDAO(this);
   late final moodDao = MoodDAO(this);
   late final emojiDao = EmojiDAO(this);
+  late final settingDao = SettingDao(this);
+  late final fileIconDao = FileIconDao(this);
 
   Future<void> _insertDefaultEmojis() async {
     await batch((batch) {

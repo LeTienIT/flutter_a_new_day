@@ -30,8 +30,13 @@ class AppSecurityStorage {
   }
 
   static Future<bool> isAppLockEnabled() async {
-    final value = await _storage.read(key: _appLockKey);
-    return value == 'true';
+    try {
+      final value = await _storage.read(key: _appLockKey);
+      return value == 'true';
+    } catch (e) {
+      print("SecureStorage error: $e");
+      return false;
+    }
   }
 
   static Future<void> setMoodLockEnabled(bool enabled) async {

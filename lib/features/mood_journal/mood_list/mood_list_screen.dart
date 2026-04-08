@@ -37,7 +37,7 @@ class MoodListScreen extends ConsumerWidget{
 
           children: [
             SpeedDialChild(
-              child: const Icon(Icons.menu_book),
+              child: const Icon(Icons.image),
               label: 'Ảnh/Video',
               onTap: () {
                 final data = filteredList.reversed.toList();
@@ -45,8 +45,8 @@ class MoodListScreen extends ConsumerWidget{
               },
             ),
             SpeedDialChild(
-              child: const Icon(Icons.menu_book),
-              label: 'Quyển sách',
+              child: const Icon(Icons.mood),
+              label: 'Nhật ký',
               onTap: () {
                 final data = filteredList.reversed.toList();
                 Navigator.pushNamed(context, '/mood-book', arguments: data);
@@ -54,7 +54,7 @@ class MoodListScreen extends ConsumerWidget{
             ),
             SpeedDialChild(
               child: const Icon(Icons.filter_alt_off),
-              label: 'Bỏ bộ lọc',
+              label: 'Xoá lọc',
               onTap: () {
                 ref.read(moodYearProvider.notifier).state = -1;
                 ref.read(moodMonthProvider.notifier).state = null;

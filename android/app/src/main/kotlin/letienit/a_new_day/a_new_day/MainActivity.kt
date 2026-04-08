@@ -28,16 +28,8 @@ class MainActivity : FlutterFragmentActivity() {
 
     private fun clearAppData() {
         val appDir = filesDir.parentFile!!
-
         // Xoá File
         File(appDir, "files").deleteRecursively()
-
-        // Xoá file database
-        File(appDir, "databases").deleteRecursively()
-
-        // Xoá shared prefs
-        File(appDir, "shared_prefs").deleteRecursively()
-
         // Xoá Flutter data
         File(appDir, "app_flutter").deleteRecursively()
     }
@@ -190,11 +182,24 @@ class MainActivity : FlutterFragmentActivity() {
     private fun unzipToApp(zipPath: String) {
         val appDir = filesDir.parentFile!!
 
+        val allowedPrefixes = listOf(
+            "files/",
+            "app_flutter/"
+        )
+
         ZipInputStream(BufferedInputStream(FileInputStream(zipPath))).use { zis ->
             var entry = zis.nextEntry
 
             while (entry != null) {
-                val outFile = File(appDir, entry.name)
+                val entryName = entry.name
+
+                if (allowedPrefixes.none { entryName.startsWith(it) }) {
+                    zis.closeEntry()
+                    entry = zis.nextEntry
+                    continue
+                }
+
+                val outFile = File(appDir, entryName)
 
                 if (entry.isDirectory) {
                     outFile.mkdirs()

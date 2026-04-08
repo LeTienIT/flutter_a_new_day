@@ -31,6 +31,7 @@ class MoodViewScreen extends ConsumerWidget {
       top: false,
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: const Color(0xFFFBF6EF),
           title: Text(
             'Quyển sách của tâm hồn',
             style: const TextStyle(fontSize: 16),

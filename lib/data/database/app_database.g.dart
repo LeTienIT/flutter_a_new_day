@@ -1541,6 +1541,657 @@ class EmojiTableCompanion extends UpdateCompanion<EmojiTableData> {
   }
 }
 
+class $SettingsTable extends Settings with TableInfo<$SettingsTable, Setting> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<String> value = GeneratedColumn<String>(
+    'value',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [key, value];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Setting> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('key')) {
+      context.handle(
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {key};
+  @override
+  Setting map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Setting(
+      key:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}key'],
+          )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value'],
+      ),
+    );
+  }
+
+  @override
+  $SettingsTable createAlias(String alias) {
+    return $SettingsTable(attachedDatabase, alias);
+  }
+}
+
+class Setting extends DataClass implements Insertable<Setting> {
+  final String key;
+  final String? value;
+  const Setting({required this.key, this.value});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['key'] = Variable<String>(key);
+    if (!nullToAbsent || value != null) {
+      map['value'] = Variable<String>(value);
+    }
+    return map;
+  }
+
+  SettingsCompanion toCompanion(bool nullToAbsent) {
+    return SettingsCompanion(
+      key: Value(key),
+      value:
+          value == null && nullToAbsent ? const Value.absent() : Value(value),
+    );
+  }
+
+  factory Setting.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Setting(
+      key: serializer.fromJson<String>(json['key']),
+      value: serializer.fromJson<String?>(json['value']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'key': serializer.toJson<String>(key),
+      'value': serializer.toJson<String?>(value),
+    };
+  }
+
+  Setting copyWith({
+    String? key,
+    Value<String?> value = const Value.absent(),
+  }) => Setting(
+    key: key ?? this.key,
+    value: value.present ? value.value : this.value,
+  );
+  Setting copyWithCompanion(SettingsCompanion data) {
+    return Setting(
+      key: data.key.present ? data.key.value : this.key,
+      value: data.value.present ? data.value.value : this.value,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Setting(')
+          ..write('key: $key, ')
+          ..write('value: $value')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(key, value);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Setting && other.key == this.key && other.value == this.value);
+}
+
+class SettingsCompanion extends UpdateCompanion<Setting> {
+  final Value<String> key;
+  final Value<String?> value;
+  final Value<int> rowid;
+  const SettingsCompanion({
+    this.key = const Value.absent(),
+    this.value = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SettingsCompanion.insert({
+    required String key,
+    this.value = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : key = Value(key);
+  static Insertable<Setting> custom({
+    Expression<String>? key,
+    Expression<String>? value,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (key != null) 'key': key,
+      if (value != null) 'value': value,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SettingsCompanion copyWith({
+    Value<String>? key,
+    Value<String?>? value,
+    Value<int>? rowid,
+  }) {
+    return SettingsCompanion(
+      key: key ?? this.key,
+      value: value ?? this.value,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<String>(value.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SettingsCompanion(')
+          ..write('key: $key, ')
+          ..write('value: $value, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $FileIconsTable extends FileIcons
+    with TableInfo<$FileIconsTable, FileIcon> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FileIconsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _pathMeta = const VerificationMeta('path');
+  @override
+  late final GeneratedColumn<String> path = GeneratedColumn<String>(
+    'path',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _posXMeta = const VerificationMeta('posX');
+  @override
+  late final GeneratedColumn<double> posX = GeneratedColumn<double>(
+    'pos_x',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _posYMeta = const VerificationMeta('posY');
+  @override
+  late final GeneratedColumn<double> posY = GeneratedColumn<double>(
+    'pos_y',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _widthMeta = const VerificationMeta('width');
+  @override
+  late final GeneratedColumn<double> width = GeneratedColumn<double>(
+    'width',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(80),
+  );
+  static const VerificationMeta _heightMeta = const VerificationMeta('height');
+  @override
+  late final GeneratedColumn<double> height = GeneratedColumn<double>(
+    'height',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(80),
+  );
+  static const VerificationMeta _pageMeta = const VerificationMeta('page');
+  @override
+  late final GeneratedColumn<int> page = GeneratedColumn<int>(
+    'page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    path,
+    posX,
+    posY,
+    width,
+    height,
+    page,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'file_icons';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FileIcon> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('path')) {
+      context.handle(
+        _pathMeta,
+        path.isAcceptableOrUnknown(data['path']!, _pathMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pathMeta);
+    }
+    if (data.containsKey('pos_x')) {
+      context.handle(
+        _posXMeta,
+        posX.isAcceptableOrUnknown(data['pos_x']!, _posXMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_posXMeta);
+    }
+    if (data.containsKey('pos_y')) {
+      context.handle(
+        _posYMeta,
+        posY.isAcceptableOrUnknown(data['pos_y']!, _posYMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_posYMeta);
+    }
+    if (data.containsKey('width')) {
+      context.handle(
+        _widthMeta,
+        width.isAcceptableOrUnknown(data['width']!, _widthMeta),
+      );
+    }
+    if (data.containsKey('height')) {
+      context.handle(
+        _heightMeta,
+        height.isAcceptableOrUnknown(data['height']!, _heightMeta),
+      );
+    }
+    if (data.containsKey('page')) {
+      context.handle(
+        _pageMeta,
+        page.isAcceptableOrUnknown(data['page']!, _pageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pageMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FileIcon map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FileIcon(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      path:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}path'],
+          )!,
+      posX:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.double,
+            data['${effectivePrefix}pos_x'],
+          )!,
+      posY:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.double,
+            data['${effectivePrefix}pos_y'],
+          )!,
+      width:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.double,
+            data['${effectivePrefix}width'],
+          )!,
+      height:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.double,
+            data['${effectivePrefix}height'],
+          )!,
+      page:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}page'],
+          )!,
+    );
+  }
+
+  @override
+  $FileIconsTable createAlias(String alias) {
+    return $FileIconsTable(attachedDatabase, alias);
+  }
+}
+
+class FileIcon extends DataClass implements Insertable<FileIcon> {
+  final int id;
+  final String path;
+  final double posX;
+  final double posY;
+  final double width;
+  final double height;
+  final int page;
+  const FileIcon({
+    required this.id,
+    required this.path,
+    required this.posX,
+    required this.posY,
+    required this.width,
+    required this.height,
+    required this.page,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['path'] = Variable<String>(path);
+    map['pos_x'] = Variable<double>(posX);
+    map['pos_y'] = Variable<double>(posY);
+    map['width'] = Variable<double>(width);
+    map['height'] = Variable<double>(height);
+    map['page'] = Variable<int>(page);
+    return map;
+  }
+
+  FileIconsCompanion toCompanion(bool nullToAbsent) {
+    return FileIconsCompanion(
+      id: Value(id),
+      path: Value(path),
+      posX: Value(posX),
+      posY: Value(posY),
+      width: Value(width),
+      height: Value(height),
+      page: Value(page),
+    );
+  }
+
+  factory FileIcon.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FileIcon(
+      id: serializer.fromJson<int>(json['id']),
+      path: serializer.fromJson<String>(json['path']),
+      posX: serializer.fromJson<double>(json['posX']),
+      posY: serializer.fromJson<double>(json['posY']),
+      width: serializer.fromJson<double>(json['width']),
+      height: serializer.fromJson<double>(json['height']),
+      page: serializer.fromJson<int>(json['page']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'path': serializer.toJson<String>(path),
+      'posX': serializer.toJson<double>(posX),
+      'posY': serializer.toJson<double>(posY),
+      'width': serializer.toJson<double>(width),
+      'height': serializer.toJson<double>(height),
+      'page': serializer.toJson<int>(page),
+    };
+  }
+
+  FileIcon copyWith({
+    int? id,
+    String? path,
+    double? posX,
+    double? posY,
+    double? width,
+    double? height,
+    int? page,
+  }) => FileIcon(
+    id: id ?? this.id,
+    path: path ?? this.path,
+    posX: posX ?? this.posX,
+    posY: posY ?? this.posY,
+    width: width ?? this.width,
+    height: height ?? this.height,
+    page: page ?? this.page,
+  );
+  FileIcon copyWithCompanion(FileIconsCompanion data) {
+    return FileIcon(
+      id: data.id.present ? data.id.value : this.id,
+      path: data.path.present ? data.path.value : this.path,
+      posX: data.posX.present ? data.posX.value : this.posX,
+      posY: data.posY.present ? data.posY.value : this.posY,
+      width: data.width.present ? data.width.value : this.width,
+      height: data.height.present ? data.height.value : this.height,
+      page: data.page.present ? data.page.value : this.page,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FileIcon(')
+          ..write('id: $id, ')
+          ..write('path: $path, ')
+          ..write('posX: $posX, ')
+          ..write('posY: $posY, ')
+          ..write('width: $width, ')
+          ..write('height: $height, ')
+          ..write('page: $page')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, path, posX, posY, width, height, page);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FileIcon &&
+          other.id == this.id &&
+          other.path == this.path &&
+          other.posX == this.posX &&
+          other.posY == this.posY &&
+          other.width == this.width &&
+          other.height == this.height &&
+          other.page == this.page);
+}
+
+class FileIconsCompanion extends UpdateCompanion<FileIcon> {
+  final Value<int> id;
+  final Value<String> path;
+  final Value<double> posX;
+  final Value<double> posY;
+  final Value<double> width;
+  final Value<double> height;
+  final Value<int> page;
+  const FileIconsCompanion({
+    this.id = const Value.absent(),
+    this.path = const Value.absent(),
+    this.posX = const Value.absent(),
+    this.posY = const Value.absent(),
+    this.width = const Value.absent(),
+    this.height = const Value.absent(),
+    this.page = const Value.absent(),
+  });
+  FileIconsCompanion.insert({
+    this.id = const Value.absent(),
+    required String path,
+    required double posX,
+    required double posY,
+    this.width = const Value.absent(),
+    this.height = const Value.absent(),
+    required int page,
+  }) : path = Value(path),
+       posX = Value(posX),
+       posY = Value(posY),
+       page = Value(page);
+  static Insertable<FileIcon> custom({
+    Expression<int>? id,
+    Expression<String>? path,
+    Expression<double>? posX,
+    Expression<double>? posY,
+    Expression<double>? width,
+    Expression<double>? height,
+    Expression<int>? page,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (path != null) 'path': path,
+      if (posX != null) 'pos_x': posX,
+      if (posY != null) 'pos_y': posY,
+      if (width != null) 'width': width,
+      if (height != null) 'height': height,
+      if (page != null) 'page': page,
+    });
+  }
+
+  FileIconsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? path,
+    Value<double>? posX,
+    Value<double>? posY,
+    Value<double>? width,
+    Value<double>? height,
+    Value<int>? page,
+  }) {
+    return FileIconsCompanion(
+      id: id ?? this.id,
+      path: path ?? this.path,
+      posX: posX ?? this.posX,
+      posY: posY ?? this.posY,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      page: page ?? this.page,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (path.present) {
+      map['path'] = Variable<String>(path.value);
+    }
+    if (posX.present) {
+      map['pos_x'] = Variable<double>(posX.value);
+    }
+    if (posY.present) {
+      map['pos_y'] = Variable<double>(posY.value);
+    }
+    if (width.present) {
+      map['width'] = Variable<double>(width.value);
+    }
+    if (height.present) {
+      map['height'] = Variable<double>(height.value);
+    }
+    if (page.present) {
+      map['page'] = Variable<int>(page.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FileIconsCompanion(')
+          ..write('id: $id, ')
+          ..write('path: $path, ')
+          ..write('posX: $posX, ')
+          ..write('posY: $posY, ')
+          ..write('width: $width, ')
+          ..write('height: $height, ')
+          ..write('page: $page')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1548,8 +2199,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $HabitStatusTable habitStatus = $HabitStatusTable(this);
   late final $MoodsTable moods = $MoodsTable(this);
   late final $EmojiTableTable emojiTable = $EmojiTableTable(this);
+  late final $SettingsTable settings = $SettingsTable(this);
+  late final $FileIconsTable fileIcons = $FileIconsTable(this);
   late final HabitDAO habitDAO = HabitDAO(this as AppDatabase);
   late final MoodDAO moodDAO = MoodDAO(this as AppDatabase);
+  late final SettingDao settingDao = SettingDao(this as AppDatabase);
+  late final FileIconDao fileIconDao = FileIconDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1559,6 +2214,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     habitStatus,
     moods,
     emojiTable,
+    settings,
+    fileIcons,
   ];
 }
 
@@ -2415,6 +3072,379 @@ typedef $$EmojiTableTableProcessedTableManager =
       EmojiTableData,
       PrefetchHooks Function()
     >;
+typedef $$SettingsTableCreateCompanionBuilder =
+    SettingsCompanion Function({
+      required String key,
+      Value<String?> value,
+      Value<int> rowid,
+    });
+typedef $$SettingsTableUpdateCompanionBuilder =
+    SettingsCompanion Function({
+      Value<String> key,
+      Value<String?> value,
+      Value<int> rowid,
+    });
+
+class $$SettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $SettingsTable> {
+  $$SettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$SettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $SettingsTable> {
+  $$SettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get value => $composableBuilder(
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$SettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SettingsTable> {
+  $$SettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<String> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+}
+
+class $$SettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SettingsTable,
+          Setting,
+          $$SettingsTableFilterComposer,
+          $$SettingsTableOrderingComposer,
+          $$SettingsTableAnnotationComposer,
+          $$SettingsTableCreateCompanionBuilder,
+          $$SettingsTableUpdateCompanionBuilder,
+          (Setting, BaseReferences<_$AppDatabase, $SettingsTable, Setting>),
+          Setting,
+          PrefetchHooks Function()
+        > {
+  $$SettingsTableTableManager(_$AppDatabase db, $SettingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$SettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$SettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$SettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> key = const Value.absent(),
+                Value<String?> value = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SettingsCompanion(key: key, value: value, rowid: rowid),
+          createCompanionCallback:
+              ({
+                required String key,
+                Value<String?> value = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SettingsCompanion.insert(
+                key: key,
+                value: value,
+                rowid: rowid,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$SettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SettingsTable,
+      Setting,
+      $$SettingsTableFilterComposer,
+      $$SettingsTableOrderingComposer,
+      $$SettingsTableAnnotationComposer,
+      $$SettingsTableCreateCompanionBuilder,
+      $$SettingsTableUpdateCompanionBuilder,
+      (Setting, BaseReferences<_$AppDatabase, $SettingsTable, Setting>),
+      Setting,
+      PrefetchHooks Function()
+    >;
+typedef $$FileIconsTableCreateCompanionBuilder =
+    FileIconsCompanion Function({
+      Value<int> id,
+      required String path,
+      required double posX,
+      required double posY,
+      Value<double> width,
+      Value<double> height,
+      required int page,
+    });
+typedef $$FileIconsTableUpdateCompanionBuilder =
+    FileIconsCompanion Function({
+      Value<int> id,
+      Value<String> path,
+      Value<double> posX,
+      Value<double> posY,
+      Value<double> width,
+      Value<double> height,
+      Value<int> page,
+    });
+
+class $$FileIconsTableFilterComposer
+    extends Composer<_$AppDatabase, $FileIconsTable> {
+  $$FileIconsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get path => $composableBuilder(
+    column: $table.path,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get posX => $composableBuilder(
+    column: $table.posX,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get posY => $composableBuilder(
+    column: $table.posY,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get width => $composableBuilder(
+    column: $table.width,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get height => $composableBuilder(
+    column: $table.height,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$FileIconsTableOrderingComposer
+    extends Composer<_$AppDatabase, $FileIconsTable> {
+  $$FileIconsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get path => $composableBuilder(
+    column: $table.path,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get posX => $composableBuilder(
+    column: $table.posX,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get posY => $composableBuilder(
+    column: $table.posY,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get width => $composableBuilder(
+    column: $table.width,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get height => $composableBuilder(
+    column: $table.height,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get page => $composableBuilder(
+    column: $table.page,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$FileIconsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FileIconsTable> {
+  $$FileIconsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get path =>
+      $composableBuilder(column: $table.path, builder: (column) => column);
+
+  GeneratedColumn<double> get posX =>
+      $composableBuilder(column: $table.posX, builder: (column) => column);
+
+  GeneratedColumn<double> get posY =>
+      $composableBuilder(column: $table.posY, builder: (column) => column);
+
+  GeneratedColumn<double> get width =>
+      $composableBuilder(column: $table.width, builder: (column) => column);
+
+  GeneratedColumn<double> get height =>
+      $composableBuilder(column: $table.height, builder: (column) => column);
+
+  GeneratedColumn<int> get page =>
+      $composableBuilder(column: $table.page, builder: (column) => column);
+}
+
+class $$FileIconsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FileIconsTable,
+          FileIcon,
+          $$FileIconsTableFilterComposer,
+          $$FileIconsTableOrderingComposer,
+          $$FileIconsTableAnnotationComposer,
+          $$FileIconsTableCreateCompanionBuilder,
+          $$FileIconsTableUpdateCompanionBuilder,
+          (FileIcon, BaseReferences<_$AppDatabase, $FileIconsTable, FileIcon>),
+          FileIcon,
+          PrefetchHooks Function()
+        > {
+  $$FileIconsTableTableManager(_$AppDatabase db, $FileIconsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$FileIconsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$FileIconsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$FileIconsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> path = const Value.absent(),
+                Value<double> posX = const Value.absent(),
+                Value<double> posY = const Value.absent(),
+                Value<double> width = const Value.absent(),
+                Value<double> height = const Value.absent(),
+                Value<int> page = const Value.absent(),
+              }) => FileIconsCompanion(
+                id: id,
+                path: path,
+                posX: posX,
+                posY: posY,
+                width: width,
+                height: height,
+                page: page,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String path,
+                required double posX,
+                required double posY,
+                Value<double> width = const Value.absent(),
+                Value<double> height = const Value.absent(),
+                required int page,
+              }) => FileIconsCompanion.insert(
+                id: id,
+                path: path,
+                posX: posX,
+                posY: posY,
+                width: width,
+                height: height,
+                page: page,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$FileIconsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FileIconsTable,
+      FileIcon,
+      $$FileIconsTableFilterComposer,
+      $$FileIconsTableOrderingComposer,
+      $$FileIconsTableAnnotationComposer,
+      $$FileIconsTableCreateCompanionBuilder,
+      $$FileIconsTableUpdateCompanionBuilder,
+      (FileIcon, BaseReferences<_$AppDatabase, $FileIconsTable, FileIcon>),
+      FileIcon,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2427,4 +3457,8 @@ class $AppDatabaseManager {
       $$MoodsTableTableManager(_db, _db.moods);
   $$EmojiTableTableTableManager get emojiTable =>
       $$EmojiTableTableTableManager(_db, _db.emojiTable);
+  $$SettingsTableTableManager get settings =>
+      $$SettingsTableTableManager(_db, _db.settings);
+  $$FileIconsTableTableManager get fileIcons =>
+      $$FileIconsTableTableManager(_db, _db.fileIcons);
 }

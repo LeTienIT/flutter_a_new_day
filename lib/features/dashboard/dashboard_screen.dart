@@ -91,7 +91,6 @@ class _DashboardScreen extends ConsumerState<DashboardScreen>{
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
-                          color: Colors.white,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.05),

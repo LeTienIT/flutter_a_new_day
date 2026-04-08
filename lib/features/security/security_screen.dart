@@ -64,7 +64,6 @@ class _SecurityScreen extends State<SecurityScreen>{
       top: false,
       child: Scaffold(
         appBar: AppBar(title: Text('Thiết lập bảo mật')),
-        drawer: Drawer(child: Menu(),),
         body: SingleChildScrollView(
           child: Column(
             children: [

@@ -7,32 +7,67 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:page_flip/page_flip.dart';
 import '../../../core/utils/tool.dart';
+import '../../setting/icon_edit/file_icon_controller.dart';
 import '../mood_list/mood_list_controller.dart';
 import '../mood_widget/full_image_screen.dart';
 import '../mood_widget/input_audio.dart';
 import '../mood_widget/video_input.dart';
+import '../widget/cover_page.dart';
+import '../widget/first_page.dart';
 
-class MoodHomeScreen extends ConsumerWidget {
-  MoodHomeScreen({super.key});
+class MoodHomeScreen extends ConsumerStatefulWidget{
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return _MoodHomeScreen();
+  }
+}
+
+class _MoodHomeScreen extends ConsumerState {
+  _MoodHomeScreen();
   final _controller = GlobalKey<PageFlipWidgetState>();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    super.initState();
+
+    Future.microtask(() {
+      ref.read(fileIconProvider.notifier).load(isAll: true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context ) {
     final state = ref.watch(moodListProvider);
     final controller = ref.watch(moodListProvider.notifier);
     MoodModel? mCurrent = controller.getToDay()!.isEmpty ? null : controller.getToDay()!.first;
-    // print(mCurrent.toString());
+    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
     return SafeArea(
       top: false,
+      bottom: false,
       child: Scaffold(
+        key: _scaffoldKey,
         appBar: mCurrent == null ? AppBar(
           title: Text(
             formatVietnameseDate(DateTime.now()),
             style: const TextStyle(fontSize: 16),
           ),
-        )
-            : null,
-        drawer: Drawer(child: mCurrent == null ? Menu() : null,),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFFa8edea),
+                  Color(0xFFa8edea),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+        ) : null,
+        drawer: Drawer(child: Menu(),),
         body: switch (state) {
           MoodListLoading() => const Center(child: CircularProgressIndicator()),
 
@@ -86,14 +121,13 @@ class MoodHomeScreen extends ConsumerWidget {
                 ],
               ),
             ),
-          )
-              : Center(
+          ) : Center(
             child: PageFlipWidget(
               key: _controller,
               backgroundColor: const Color(0xFFFBF6EF), // Màu giấy ngà
-              lastPage: _buildCoverPage(), // Trang cuối - bìa sau
+              lastPage: const CoverPageView(),
               children: [
-                _buildFirstPage(mCurrent),
+                FirstPageView(m: mCurrent),
                 ..._buildNotePages(context, mCurrent.note),
                 if(mCurrent.image?.isNotEmpty == true || mCurrent.audio?.isNotEmpty == true || mCurrent.video?.isNotEmpty == true)
                   _buildImageAudio(context, mCurrent.image, mCurrent.audio, mCurrent.video)
@@ -102,154 +136,18 @@ class MoodHomeScreen extends ConsumerWidget {
           ),
 
           MoodListError() => const Center(child: Text("Lỗi tải dữ liệu")),
-          _ => const SizedBox(),
         },
         floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-        floatingActionButton: Transform.translate(
+        floatingActionButton: mCurrent != null ? Transform.translate(
           offset: const Offset(-5, 5),
           child: FloatingActionButton(
             mini: true,
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/mood-list',
-                  (route) => false,
-            ),
-            child: const Icon(Icons.list, size: 16),
+            onPressed: () {
+              _scaffoldKey.currentState?.openDrawer();
+            },
+            child: const Icon(Icons.menu_open, size: 16),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPage(int number) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFBF6EF), // Màu giống giấy
-        border: const Border(
-          right: BorderSide(color: Color(0xFFD6C6B5), width: 6), // Viền bên phải
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.brown.withValues(alpha: 0.15),
-            offset: const Offset(2, 2),
-            blurRadius: 6,
-          ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          'Trang $number',
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Georgia',
-            color: Colors.brown,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFirstPage(MoodModel m) {
-    final parts = m.emoji.split('|');
-    final imagePath = parts.first;
-    final slogan = parts.length > 1 ? parts.last : '';
-
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFFd7ccc8), Color(0xFFa1887f)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        border: const Border(
-          right: BorderSide(color: Color(0xFFD6C6B5), width: 6),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.brown.withValues(alpha: 0.15),
-            offset: const Offset(2, 2),
-            blurRadius: 6,
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 30,
-            child: Image.asset(
-              'assets/sticker/hoa_sen.png',
-              width: 80,
-              height: 80,
-            ),
-          ),
-          Positioned(
-            top: 0,
-            right: 0,
-            child: Image.asset(
-              'assets/sticker/tra_sua.png',
-              width: 80,
-              height: 80,
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            left: 80,
-            child: Image.asset(
-              'assets/sticker/hoa_hong.png',
-              width: 80,
-              height: 80,
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                formatVietnameseDate(m.date),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 30),
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 16,
-                runSpacing: 12,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Image.asset(
-                    imagePath,
-                    width: 64,
-                    height: 64,
-                  ),
-                  Text(
-                    slogan,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: Image.asset(
-              'assets/emoji_default/arrow.png',
-              width: 80,
-              height: 20,
-              fit: BoxFit.fill,
-            ),
-          ),
-        ],
+        ) : null,
       ),
     );
   }
@@ -259,10 +157,10 @@ class MoodHomeScreen extends ConsumerWidget {
 
     final size = MediaQuery.of(context).size;
     const padding = EdgeInsets.all(24);
-    const margin = EdgeInsets.all(20);
+    const margin = EdgeInsets.all(30);
     final maxWidth = size.width - padding.horizontal - margin.horizontal - 40;
     final maxHeight = size.height - padding.vertical - margin.vertical;
-    final style = const TextStyle(fontSize: 18, height: 1.5);
+    final style = const TextStyle(fontSize: 18, height: 1.5, color: Colors.black);
 
     final pages = splitNoteToPages(
       note: note,
@@ -342,7 +240,7 @@ class MoodHomeScreen extends ConsumerWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => FullScreenImagePage(imagePath: image!),
+                        builder: (_) => FullScreenImagePage(imagePath: image),
                       ),
                     );
                   },
@@ -380,87 +278,4 @@ class MoodHomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildCoverPage() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFFd7ccc8), Color(0xFFa1887f)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: 20,
-            left: 20,
-            child: Image.asset(
-              'assets/sticker/trai_tim.png',
-              width: 60,
-              height: 80,
-            ),
-          ),
-          Positioned(
-            top: 60,
-            right: 20,
-            child: Image.asset(
-              'assets/sticker/buc_tranh.png',
-              width: 100,
-              height: 100,
-            ),
-          ),
-          Positioned(
-            bottom: 60,
-            right: 20,
-            child: Image.asset(
-              'assets/sticker/hoa.png',
-              width: 100,
-              height: 100,
-            ),
-          ),
-          Positioned(
-            bottom: 60,
-            left: 20,
-            child: Image.asset(
-              'assets/sticker/co_4_la.png',
-              width: 100,
-              height: 100,
-            ),
-          ),
-          Center(
-            child: Text(
-              '<3 NHẬT KÝ CỦA TRÁI TIM S2',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w600,
-                color: Colors.brown,
-                shadows: [
-                  Shadow(
-                    offset: Offset(2, 2),
-                    blurRadius: 3,
-                    color: Colors.black26,
-                  )
-                ],
-              ),
-            ),
-          ),
-          const Positioned(
-            bottom: 60,
-            left: 16,
-            right: 16,
-            child: Text(
-              '"Cảm xúc hôm nay là món quà của ngày mai"',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                fontStyle: FontStyle.italic,
-                color: Colors.black54,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

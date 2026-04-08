@@ -16,15 +16,17 @@ import 'package:a_new_day/features/mood_journal/mood_list/mood_list_screen.dart'
 import 'package:a_new_day/features/mood_journal/mood_view/mood_view_screen.dart';
 import 'package:a_new_day/features/security/authen_screen.dart';
 import 'package:a_new_day/features/security/security_screen.dart';
+import 'package:a_new_day/features/setting/setting_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'core/theme/dark_theme.dart';
-import 'core/theme/light_theme.dart';
+import 'core/theme/app_theme_provider.dart';
+import 'core/theme/app_theme.dart';
 import 'features/mood_journal/emoji_repository.dart';
 import 'features/mood_journal/mood_add/mood_add_screen.dart';
 import 'features/mood_journal/mood_edit/mood_edit_screen.dart';
 import 'features/mood_journal/mood_home/mood_home_screen.dart';
 import 'features/mood_journal/mood_media/mood_media_page.dart';
+import 'features/setting/setting_controller.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +50,7 @@ class _MyAppState extends ConsumerState<MyApp> {
   @override
   void initState() {
     super.initState();
+    ref.read(settingsInitProvider);
     ref.read(emojisNotifierProvider);
     _loadApp();
   }
@@ -60,11 +63,13 @@ class _MyAppState extends ConsumerState<MyApp> {
   }
   @override
   Widget build(BuildContext context) {
+    final themeMode = ref.watch(appThemeProvider);
+
     return MaterialApp(
       title: 'Một ngày mới',
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: ThemeMode.light,
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: themeMode,
       onGenerateRoute: (settings) {
           switch (settings.name) {
             case '/mood-home':
@@ -111,6 +116,8 @@ class _MyAppState extends ConsumerState<MyApp> {
             case '/mood-media':
               final listMood = settings.arguments as List<MoodModel>;
               return MaterialPageRoute(builder: (_) => MoodMediaPage(listMood));
+            case '/setting':
+              return MaterialPageRoute(builder: (_) => SettingsPage());
             default:
               return MaterialPageRoute(builder: (_) => Scaffold(appBar: AppBar(title: Text('Lỗi')),drawer: Drawer(child: Menu(),),body: Center(child: Text('Không tìm thấy trang! Lỗi!'),),));
           }
