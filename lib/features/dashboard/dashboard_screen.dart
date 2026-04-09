@@ -102,61 +102,68 @@ class _DashboardScreen extends ConsumerState<DashboardScreen>{
                             )
                           ],
                         ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () async{
-                                  final lockMood = await AppSecurityStorage.isMoodLockEnabled();
-                                  if(lockMood && !AppSecurityStorage.hasUnlockedMoodOnce)
-                                  {
-                                    final unLocked = await Navigator.push<bool>(
-                                      context,
-                                      MaterialPageRoute(builder: (_) => PinAuthScreen(type: AuthType.mood)),
-                                    );
-                                    if(unLocked == true){
-                                      Navigator.pushNamedAndRemoveUntil(context, '/mood-home', (router) => false);
-                                    }
-                                  }
-                                  else{
-                                    Navigator.pushNamedAndRemoveUntil(context, '/mood-home', (router) => false);
-                                  }
-                                },
-                                child: const Text("Nhật ký", textAlign: TextAlign.center,),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: ElevatedButton(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              ElevatedButton(
                                 onPressed: () async {
                                   final lockMood = await AppSecurityStorage.isMoodLockEnabled();
-                                  if(lockMood && !AppSecurityStorage.hasUnlockedMoodOnce)
-                                  {
+                                  if (lockMood && !AppSecurityStorage.hasUnlockedMoodOnce) {
                                     final unLocked = await Navigator.push<bool>(
                                       context,
-                                      MaterialPageRoute(builder: (_) => PinAuthScreen(type: AuthType.mood)),
+                                      MaterialPageRoute(
+                                          builder: (_) => PinAuthScreen(type: AuthType.mood)),
                                     );
-                                    if(unLocked == true){
-                                      Navigator.pushNamedAndRemoveUntil(context, '/mood-list', (router) => false);
+                                    if (unLocked == true) {
+                                      Navigator.pushNamedAndRemoveUntil(
+                                          context, '/mood-home', (router) => false);
                                     }
-                                  }
-                                  else{
-                                    Navigator.pushNamedAndRemoveUntil(context, '/mood-list', (router) => false);
+                                  } else {
+                                    Navigator.pushNamedAndRemoveUntil(
+                                        context, '/mood-home', (router) => false);
                                   }
                                 },
-                                child: const Text("Danh sách", textAlign: TextAlign.center,),
+                                child: const Center(
+                                  child: Text("Nhật ký", textAlign: TextAlign.center),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: ElevatedButton(
+                              const SizedBox(width: 5),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final lockMood = await AppSecurityStorage.isMoodLockEnabled();
+                                  if (lockMood && !AppSecurityStorage.hasUnlockedMoodOnce) {
+                                    final unLocked = await Navigator.push<bool>(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => PinAuthScreen(type: AuthType.mood)),
+                                    );
+                                    if (unLocked == true) {
+                                      Navigator.pushNamedAndRemoveUntil(
+                                          context, '/mood-list', (router) => false);
+                                    }
+                                  } else {
+                                    Navigator.pushNamedAndRemoveUntil(
+                                        context, '/mood-list', (router) => false);
+                                  }
+                                },
+                                child: const Center(
+                                  child: Text("Danh sách", textAlign: TextAlign.center),
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+
+                              ElevatedButton(
                                 onPressed: () {
-                                  Navigator.pushNamedAndRemoveUntil(context, '/habit-home', (route) => false);
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context, '/habit-home', (route) => false);
                                 },
-                                child: const Text("Hằng ngày", textAlign: TextAlign.center,),
+                                child: const Center(
+                                  child: Text("Hằng ngày", textAlign: TextAlign.center),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],
