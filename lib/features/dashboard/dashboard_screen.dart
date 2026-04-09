@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/utils/app_security_storage.dart';
 import '../../core/utils/tool.dart';
 import '../security/authen_screen.dart';
+import '../setting/setting_controller.dart';
 import '../welcome/WelcomPopup.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget{
@@ -31,6 +32,7 @@ class _DashboardScreen extends ConsumerState<DashboardScreen>{
   Widget build(BuildContext context) {
     final state = ref.watch(dashboardProvider);
     final stateNotifier = ref.read(dashboardProvider.notifier);
+    final showCompletedAsync = ref.watch(showCompletedProvider);
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -70,22 +72,40 @@ class _DashboardScreen extends ConsumerState<DashboardScreen>{
                                 const SizedBox(height: 16),
                               ],
 
-                              if (deleted.isNotEmpty) ...[
-                                Text('Các việc đã không còn thực hiện', style: Theme.of(context).textTheme.titleMedium),
+                              if (deleted.isNotEmpty)
+                                showCompletedAsync.when(
+                                  loading: () => const SizedBox(),
+                                  error: (e, _) => Text('Error: $e'),
+                                  data: (value) {
+                                    if (!value) return const SizedBox();
 
-                                const SizedBox(height: 8),
-                                ...deleted.map((item) => Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.close, color: Colors.red, size: 16),
-                                      const SizedBox(width: 8),
-                                      Expanded(child: Text(item)),
-                                    ],
-                                  ),
-                                )),
-                                const SizedBox(height: 18),
-                              ],
+                                    return Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Các việc đã không còn thực hiện',
+                                          style: Theme.of(context).textTheme.titleMedium,
+                                        ),
+                                        const SizedBox(height: 8),
+
+                                        ...deleted.map(
+                                              (item) => Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 15),
+                                            child: Row(
+                                              children: [
+                                                const Icon(Icons.close, color: Colors.red, size: 16),
+                                                const SizedBox(width: 8),
+                                                Expanded(child: Text(item)),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+
+                                        const SizedBox(height: 18),
+                                      ],
+                                    );
+                                  },
+                                ),
                             ],
                           ),
                         ),
