@@ -50,7 +50,7 @@ class _MoodHomeScreen extends ConsumerState {
         appBar: mCurrent == null ? AppBar(
           title: Text(
             formatVietnameseDate(DateTime.now()),
-            style: const TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 16, color: Colors.black),
           ),
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -67,7 +67,7 @@ class _MoodHomeScreen extends ConsumerState {
             ),
           ),
         ) : null,
-        drawer: Drawer(child: Menu(),),
+        drawer: Drawer(child: Menu(), surfaceTintColor: Colors.black,),
         body: switch (state) {
           MoodListLoading() => const Center(child: CircularProgressIndicator()),
 
@@ -92,7 +92,7 @@ class _MoodHomeScreen extends ConsumerState {
                       SizedBox(width: 10),
                       Text(
                         'Hôm nay bạn thế nào?',
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
                       ),
                     ],
                   ),
@@ -112,9 +112,20 @@ class _MoodHomeScreen extends ConsumerState {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: () {Navigator.pushNamed(context, '/mood-add');},
-                      child: const Text(
-                        'Lưu giữ lại ký ức hôm nay chứ?',
-                        style: TextStyle(fontSize: 16),
+                      child: ShaderMask(
+                        shaderCallback: (bounds) {
+                          return const LinearGradient(
+                            colors: [Color(0xFFa8edea), Color(0xFFfed6e3)],
+                          ).createShader(bounds);
+                        },
+                        child: const Text(
+                          'Lưu giữ lại ký ức hôm nay chứ?',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ),

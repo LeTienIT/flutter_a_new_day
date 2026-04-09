@@ -7,7 +7,7 @@ List<Widget> buildNotePages(BuildContext context, String? note) {
 
   final size = MediaQuery.of(context).size;
   const padding = EdgeInsets.all(18);
-  const margin = EdgeInsets.all(16);
+  const margin = EdgeInsets.only(top: 40, left: 10, right: 10, bottom: 10);
   final maxWidth = size.width - padding.horizontal - margin.horizontal - 80;
   final maxHeight = size.height - padding.vertical - margin.vertical;
   final style = const TextStyle(fontSize: 18, height: 1.2);

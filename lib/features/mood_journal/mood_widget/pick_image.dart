@@ -48,32 +48,90 @@ class _ImageInput extends State<ImageInput>{
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _iconFile != null
-              ? Image.file(
-            _iconFile!,
-            fit: BoxFit.cover,
-            width: 200, // Bạn có thể thêm width cố định nếu cần
-          )
-              : const Icon(Icons.photo, size: 50),
-          const SizedBox(height: 10),
-          ElevatedButton.icon(
-            onPressed: _pickIcon,
-            icon: const Icon(Icons.image),
-            label: const Text('Tấm ảnh đẹp nhất hôm nay'),
+    return GestureDetector(
+      onTap: _pickIcon,
+      child: AspectRatio(
+        aspectRatio: 1, // vuông, bạn có thể đổi 16/9
+        child: Container(
+          margin: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.grey.shade200,
           ),
-          SizedBox(height: 10,),
-          if(_iconFile!=null)
-            ElevatedButton.icon(
-              onPressed: _iconFile!=null ? _deleteVideo : null,
-              icon: const Icon(Icons.delete),
-              label: const Text('Xóa ảnh hiện tại'),
-            ),
-        ],
+          child: Stack(
+            children: [
+              /// IMAGE / PLACEHOLDER
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: _iconFile != null
+                      ? Image.file(
+                    _iconFile!,
+                    fit: BoxFit.cover,
+                  )
+                      : Container(
+                    color: Colors.grey.shade300,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(
+                          Icons.image,
+                          size: 60,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Chạm để chọn ảnh',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              /// OVERLAY nhẹ cho đẹp
+              if (_iconFile == null)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.black.withOpacity(0.05),
+                          Colors.black.withOpacity(0.1),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                  ),
+                ),
+
+              /// DELETE BUTTON
+              if (_iconFile != null)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: GestureDetector(
+                    onTap: _deleteVideo,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(6),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

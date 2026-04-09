@@ -29,6 +29,8 @@ class HabitListScreen extends ConsumerWidget{
           HabitListError(:final message) => Center(child: throw('Error: $message')),
           HabitListData(: final listData, : final activeItemId) => Column(
             children: [
+              const Divider(height: 1,),
+              const SizedBox(height: 10,),
               Padding(
                 padding: EdgeInsets.all(12),
                 child: Wrap(

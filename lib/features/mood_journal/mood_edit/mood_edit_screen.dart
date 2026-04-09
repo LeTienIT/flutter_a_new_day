@@ -24,8 +24,11 @@ class _MoodEditScreenState extends ConsumerState<MoodEditScreen> {
   String note = '';
   late TextEditingController _sloganController;
   late TextEditingController _noteController;
-
+  bool _isSaving = false;
   String? iconPath , _savedAudioPath, videoPath ;
+
+  String? _resolvedAudioPath;
+  bool _loadingAudio = true;
 
   @override
   void initState() {
@@ -38,8 +41,17 @@ class _MoodEditScreenState extends ConsumerState<MoodEditScreen> {
     iconPath = widget.mood.image;
     _savedAudioPath = widget.mood.audio;
     videoPath = widget.mood.video;
-    // print(("load edit: ${widget.mood.toString()}"));
+    _loadAudio();
     super.initState();
+  }
+
+  Future<void> _loadAudio() async {
+    final path = await resolveFilePath(_savedAudioPath);
+
+    setState(() {
+      _resolvedAudioPath = path;
+      _loadingAudio = false;
+    });
   }
   @override
   void dispose() {
@@ -137,51 +149,126 @@ class _MoodEditScreenState extends ConsumerState<MoodEditScreen> {
 
                   const SizedBox(height: 30),
 
-                  ImageInput(
-                    initialIconPath: iconPath,
-                    onIconPicked: (path) {
-                      iconPath = path;
+                  FutureBuilder<String?>(
+                    future: resolveFilePath(iconPath),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const SizedBox(
+                          height: 150,
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+
+                      if (!snapshot.hasData || snapshot.data == null) {
+                        return ImageInput(
+                          initialIconPath: '',
+                          onIconPicked: (path) {
+                            if(path!=null){
+                              iconPath = path;
+                            }
+                          },
+                        );
+                      }
+                      return ImageInput(
+                        initialIconPath: snapshot.data!,
+                        onIconPicked: (path) {
+                          iconPath = path;
+                        },
+                      );
                     },
                   ),
-                  const SizedBox(height: 30),
-
-                  VideoInput(
-                      initialVideoPath: videoPath,
-                      onVideoPicked: (path){
-                        videoPath = path;
-                      }),
 
                   const SizedBox(height: 30),
 
-                  AudioRecorderWidget(
-                    initialAudioPath: _savedAudioPath,
-                    onAudioSaved: (path) {
-                      setState(() {
-                        _savedAudioPath = path;
-                      });
+                  FutureBuilder<String?>(
+                    future: resolveFilePath(videoPath),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const SizedBox(
+                          height: 150,
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                      if (!snapshot.hasData || snapshot.data == null) {
+                        return VideoInput(
+                            initialVideoPath: videoPath,
+                            onVideoPicked: (path){
+                              if(path!=null){
+                                videoPath = path;
+                              }
+                            });
+                      }
+
+                      return VideoInput(
+                          initialVideoPath: videoPath,
+                          onVideoPicked: (path){
+                            videoPath = path;
+                          }
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  FutureBuilder<String?>(
+                    future: resolveFilePath(_savedAudioPath),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const SizedBox(
+                          height: 150,
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                      if (!snapshot.hasData || snapshot.data == null) {
+                        return AudioRecorderWidget(
+                          initialAudioPath: _savedAudioPath,
+                          onAudioSaved: (path) {
+                              _savedAudioPath = path;
+                            }
+                        );
+                      }
+
+                      return AudioRecorderWidget(
+                        initialAudioPath: _savedAudioPath,
+                        onAudioSaved: (path) {
+                          _savedAudioPath = path;
+                        },
+                      );
                     },
                   ),
 
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: selectedEmojiPath == null || slogan.isEmpty ? null : () async {
-                        final newMood = MoodModel(
-                          id: widget.mood.id,
-                          date: widget.mood.date,
-                          emoji: '$selectedEmojiPath|$slogan',
-                          note: _noteController.text.isEmpty ? null : _noteController.text,
-                          image: iconPath ?? null,
-                          audio: _savedAudioPath ?? null,
-                          video: videoPath ?? null,
-                        );
-                        // print('mood: ${widget.mood.toString()}\nnew: ${newMood.toString()}');
-                        await ref.read(moodListProvider.notifier).updateMood(widget.mood, newMood);
+                      onPressed: (selectedEmojiPath == null || slogan.isEmpty || _isSaving) ? null : () async {
+                        setState(() => _isSaving = true);
+                        try {
+                          final newMood = MoodModel(
+                            id: widget.mood.id,
+                            date: widget.mood.date,
+                            emoji: '$selectedEmojiPath|$slogan',
+                            note: _noteController.text.isEmpty ? null : _noteController.text,
+                            image: iconPath,
+                            audio: _savedAudioPath,
+                            video: videoPath,
+                          );
 
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nhật ký đã được cập nhật')));
-                        // Navigator.pushNamedAndRemoveUntil(context, '/mood-home', (router)=>false);
+                          await ref.read(moodListProvider.notifier).updateMood(widget.mood, newMood);
+
+                          if (!mounted) return;
+
+                          showTopToast(context, "Nhật ký đã được cập nhật");
+                        } finally {
+                          if (mounted) {
+                            setState(() => _isSaving = false);
+                          }
+                        }
                       },
-                      child: const Text('Lưu nhật ký'),
+                      child: _isSaving ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ) : const Text('Lưu nhật ký'),
                     ),
                   ),
                 ],

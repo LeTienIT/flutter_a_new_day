@@ -15,43 +15,98 @@ import '../mood_widget/build_media_page.dart';
 import '../mood_widget/full_image_screen.dart';
 import '../mood_widget/input_audio.dart';
 import '../mood_widget/video_input.dart';
+import '../widget/cover_page.dart';
+import '../widget/first_page.dart';
 
-class MoodViewScreen extends ConsumerWidget {
-  MoodModel mood;
+class TripleTapBackWrapper extends StatefulWidget {
+  final Widget child;
 
-  MoodViewScreen({super.key, required this.mood});
+  const TripleTapBackWrapper({super.key, required this.child});
+
+  @override
+  State<TripleTapBackWrapper> createState() => _TripleTapBackWrapperState();
+}
+
+class _TripleTapBackWrapperState extends State<TripleTapBackWrapper> {
+  int _tapCount = 0;
+  DateTime? _lastTap;
+
+  void _handleTap(BuildContext context) {
+    final now = DateTime.now();
+
+    if (_lastTap == null ||
+        now.difference(_lastTap!) > const Duration(seconds: 1)) {
+      _tapCount = 0;
+    }
+
+    _tapCount++;
+    _lastTap = now;
+
+    if (_tapCount >= 3) {
+      Navigator.pop(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (_) => _handleTap(context),
+      child: widget.child,
+    );
+  }
+}
+
+class MoodViewScreen extends ConsumerStatefulWidget {
+  final MoodModel mood;
+
+  const MoodViewScreen({super.key, required this.mood});
+
+  @override
+  ConsumerState<MoodViewScreen> createState() => _MoodViewScreenState();
+}
+
+
+class _MoodViewScreenState extends ConsumerState<MoodViewScreen> {
 
   final _controller = GlobalKey<PageFlipWidgetState>();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    MoodModel? mCurrent = mood;
+  void initState() {
+    super.initState();
 
-    return SafeArea(
-      top: false,
-      child: Scaffold(
-        appBar: AppBar(
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showTopToast(context, "Chạm 3 lần để quay lại");
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    MoodModel? mCurrent = widget.mood;
+
+    return TripleTapBackWrapper(
+      child: SafeArea(
+        top: false,
+        child: Scaffold(
           backgroundColor: const Color(0xFFFBF6EF),
-          title: Text(
-            'Quyển sách của tâm hồn',
-            style: const TextStyle(fontSize: 16),
-          ),
-        ),
-        body: Center(
-          child: PageFlipWidget(
-            key: _controller,
-            backgroundColor: const Color(0xFFFBF6EF),
-            lastPage: buildCoverPage(),
-            children: [
-              buildFirstPage(m: mCurrent),
-              ...buildNotePages(context, mCurrent.note),
-              if(mCurrent.image?.isNotEmpty == true || mCurrent.audio?.isNotEmpty == true || mCurrent.video?.isNotEmpty == true)
-                BuildMediaPage(context, image: mCurrent.image, audio: mCurrent.audio, video:  mCurrent.video),
-            ],
+          body: Center(
+            child: PageFlipWidget(
+              key: _controller,
+              backgroundColor: const Color(0xFFFBF6EF),
+              lastPage: CoverPageView(),
+              children: [
+                FirstPageView(m: mCurrent),
+                ...buildNotePages(context, mCurrent.note),
+                if(mCurrent.image?.isNotEmpty == true || mCurrent.audio?.isNotEmpty == true || mCurrent.video?.isNotEmpty == true)
+                  BuildMediaPage(context, image: mCurrent.image, audio: mCurrent.audio, video:  mCurrent.video),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-
 }
+

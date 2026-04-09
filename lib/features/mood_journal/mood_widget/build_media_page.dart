@@ -41,12 +41,19 @@ class BuildMediaPage extends StatelessWidget{
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const SizedBox(height: 40,),
             if (image?.isNotEmpty == true) ...[
               Text('Bức ảnh đẹp nhất ngày đó'),
               SizedBox(height: 20),
               FutureBuilder<String?>(
                 future: resolveFilePath(image),
                 builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox(
+                      height: 150,
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
                   if (!snapshot.hasData || snapshot.data == null) {
                     return Text("Có lỗi gì đó.");
                   }
@@ -75,6 +82,12 @@ class BuildMediaPage extends StatelessWidget{
               FutureBuilder<String?>(
                 future: resolveFilePath(video),
                 builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox(
+                      height: 150,
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
                   if (!snapshot.hasData || snapshot.data == null) {
                     return Text("Có lỗi gì đó.");
                   }
@@ -94,6 +107,12 @@ class BuildMediaPage extends StatelessWidget{
               FutureBuilder<String?>(
                 future: resolveFilePath(audio),
                 builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox(
+                      height: 150,
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
                   if (!snapshot.hasData || snapshot.data == null) {
                     return Text("Có lỗi gì đó.");
                   }

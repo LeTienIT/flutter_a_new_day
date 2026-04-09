@@ -4,41 +4,69 @@ import '../../../data/database/dao/habit_dao.dart';
 import '../../../data/database/providers/database_providers.dart';
 import '../../../data/models/habit_status_model.dart';
 
-enum HabitHistoryFilterType { all, day, week, month }
-
-final habitFilterDateProvider = StateProvider<DateTime?>((ref) => null);
-final habitFilterTypeProvider = StateProvider<HabitHistoryFilterType>((ref) => HabitHistoryFilterType.all);
+final filterYearProvider = StateProvider<int?>((ref) => null);
+final filterMonthProvider = StateProvider<int?>((ref) => null);
+final filterDayProvider = StateProvider<int?>((ref) => null);
 
 final filteredHabitHistoryProvider = Provider<List<HabitStatusModel>>((ref) {
   final asyncState = ref.watch(habitHistoryProvider);
-  final filterDate = ref.watch(habitFilterDateProvider);
-  final filterType = ref.watch(habitFilterTypeProvider);
+
+  final year = ref.watch(filterYearProvider);
+  final month = ref.watch(filterMonthProvider);
+  final day = ref.watch(filterDayProvider);
 
   if (!asyncState.hasValue) return [];
 
-  final allData = asyncState.value!;
-  if (filterDate == null || filterType == HabitHistoryFilterType.all) return allData;
+  final data = asyncState.value!;
+  final now = DateTime.now();
 
-  return allData.where((status) {
-    final d = status.date;
-    final f = filterDate;
+  return data.where((e) {
+    final d = e.date;
 
-    switch (filterType) {
-      case HabitHistoryFilterType.day:
-        return d.year == f!.year && d.month == f.month && d.day == f.day;
-      case HabitHistoryFilterType.week:
-        final startOfWeek = f!.subtract(Duration(days: f.weekday - 1));
-        final endOfWeek = startOfWeek.add(const Duration(days: 6));
-        return d.isAfter(startOfWeek.subtract(const Duration(seconds: 1))) &&
-            d.isBefore(endOfWeek.add(const Duration(days: 1)));
-      case HabitHistoryFilterType.month:
-        return d.year == f!.year && d.month == f.month;
-      default:
-        return true;
+    /// ❗ KHÔNG chọn gì → show all
+    if (year == null && month == null && day == null) {
+      return true;
     }
+
+    /// chỉ chọn năm
+    if (year != null && month == null && day == null) {
+      return d.year == year;
+    }
+
+    /// năm + tháng
+    if (year != null && month != null && day == null) {
+      return d.year == year && d.month == month;
+    }
+
+    /// full
+    if (year != null && month != null && day != null) {
+      return d.year == year &&
+          d.month == month &&
+          d.day == day;
+    }
+
+    /// tháng thôi → dùng năm hiện tại
+    if (year == null && month != null && day == null) {
+      return d.year == now.year && d.month == month;
+    }
+
+    /// ngày thôi
+    if (year == null && month == null && day != null) {
+      return d.year == now.year &&
+          d.month == now.month &&
+          d.day == day;
+    }
+
+    /// tháng + ngày
+    if (year == null && month != null && day != null) {
+      return d.year == now.year &&
+          d.month == month &&
+          d.day == day;
+    }
+
+    return true;
   }).toList();
 });
-
 
 final habitHistoryProvider = AsyncNotifierProvider<HabitHistoryNotifier, List<HabitStatusModel>>(
   HabitHistoryNotifier.new,

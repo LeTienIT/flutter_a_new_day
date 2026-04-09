@@ -36,8 +36,8 @@ class HabitStatusItem extends ConsumerWidget{
         alignment: WrapAlignment.end,
         children: [
           Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
                 'Ngày: ${formatVietnameseDate(h.date)}',

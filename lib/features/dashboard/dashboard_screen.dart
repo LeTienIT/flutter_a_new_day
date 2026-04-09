@@ -47,6 +47,9 @@ class _DashboardScreen extends ConsumerState<DashboardScreen>{
 
                   return Column(
                     children: [
+                      const Divider(color: Colors.grey,),
+                      const SizedBox(height: 10,),
+
                       Expanded(
                         child: SingleChildScrollView(
                           padding: const EdgeInsets.only(bottom: 16),

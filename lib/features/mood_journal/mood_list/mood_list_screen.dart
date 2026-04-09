@@ -29,11 +29,9 @@ class MoodListScreen extends ConsumerWidget{
         floatingActionButton: SpeedDial(
           icon: Icons.add,
           activeIcon: Icons.close,
-          backgroundColor: Colors.white,
           overlayOpacity: 0.5,
           spacing: 4,
           spaceBetweenChildren: 4,
-          overlayColor: Colors.black,
 
           children: [
             SpeedDialChild(
@@ -67,6 +65,8 @@ class MoodListScreen extends ConsumerWidget{
           MoodListLoading() => const Center(child: CircularProgressIndicator()),
           MoodListData(:final listData, :final activeItemId) => Column(
             children: [
+              const Divider(height: 1,),
+              const SizedBox(height: 10,),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: MoodFilterBar(),

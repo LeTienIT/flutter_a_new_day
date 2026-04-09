@@ -42,7 +42,7 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
     return SafeArea(
       top: false,
         child: Scaffold(
-      appBar: AppBar(title: const Text('Ghi lại cảm xúc hôm nay')),
+      appBar: AppBar(title: Text('Nhật ký',)),
       body: emojiAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, st) => Center(child: Text('Lỗi tải emoji: $e')),
@@ -181,7 +181,8 @@ class _AddMoodScreenState extends ConsumerState<AddMoodScreen> {
                       );
                       await ref.read(moodListProvider.notifier).insertMood(newMood);
 
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nhật ký đã được lưu trữ')));
+                      showTopToast(context, "Nhật ký đã được lưu trữ");
+
                       Navigator.pushNamedAndRemoveUntil(context, '/mood-home', (router)=>false);
                     },
                     child: const Text('Lưu nhật ký'),

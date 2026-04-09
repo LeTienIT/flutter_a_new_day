@@ -48,6 +48,8 @@ class _HomeHabitScreen extends ConsumerState<HomeHabitScreen>{
           drawer: Drawer(child: Menu(),),
           body: Column(
             children: [
+              const Divider(height: 1,),
+              const SizedBox(height: 10,),
               Padding(
                 padding: EdgeInsets.only(top: 10, bottom: 5),
                 child: Text("🎯 Hôm nay: $completed / $total ($percent%) hoàn thành"),

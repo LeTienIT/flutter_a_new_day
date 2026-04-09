@@ -157,3 +157,47 @@ Future<String?> resolveFilePath(String? storedPath) async {
 
   return null;
 }
+
+void showTopToast(BuildContext context, String message) {
+  final overlay = Overlay.of(context);
+
+  late OverlayEntry entry;
+
+  entry = OverlayEntry(
+    builder: (context) {
+      return Positioned(
+        top: MediaQuery.of(context).padding.top + 10, // tránh tai thỏ
+        left: 20,
+        right: 20,
+        child: Material(
+          color: Colors.transparent,
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 300),
+            opacity: 1,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.black87,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                message,
+                style: const TextStyle(color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+
+  overlay.insert(entry);
+
+  Future.delayed(const Duration(seconds: 2), () {
+    entry.remove();
+  });
+}

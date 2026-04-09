@@ -118,76 +118,130 @@ class _VideoInputState extends State<VideoInput> {
 
   @override
   Widget build(BuildContext context) {
-    Widget videoWidget;
+    Widget videoContent;
+
     if (_isLoading) {
-      videoWidget = const SizedBox(
-        height: 200,
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
+      videoContent = const Center(
+        child: CircularProgressIndicator(),
       );
     } else if (_controller != null &&
         _chewieController != null &&
         _controller!.value.isInitialized) {
-      videoWidget = AspectRatio(
-        aspectRatio: _controller!.value.aspectRatio,
-        child: Chewie(controller: _chewieController!),
-      );
+      videoContent = Chewie(controller: _chewieController!);
     } else {
-      videoWidget = const Icon(Icons.videocam, size: 50);
+      videoContent = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.videocam, size: 60, color: Colors.grey),
+          SizedBox(height: 8),
+          Text(
+            'Chạm để chọn video',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ],
+      );
     }
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Stack(
-            alignment: Alignment.topRight,
+    return GestureDetector(
+      onTap: widget.enableEdit ? _pickVideo : null,
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: Container(
+          margin: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.black,
+          ),
+          child: Stack(
             children: [
-              videoWidget,
+              /// VIDEO / PLACEHOLDER
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: videoContent,
+                ),
+              ),
+
+              /// OVERLAY nhẹ khi chưa có video
+              if (_videoFile == null)
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.black.withOpacity(0.2),
+                          Colors.black.withOpacity(0.4),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
+                  ),
+                ),
+
+              /// DELETE BUTTON
+              if (_videoFile != null && widget.enableEdit)
+                Positioned(
+                  top: 33,
+                  right: 13,
+                  child: GestureDetector(
+                    onTap: _deleteVideo,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(6),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                ),
+
+              /// DOWNLOAD BUTTON (giữ logic cũ)
               if (_videoFile != null)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: IconButton(
-                    icon: Icon(Icons.download, color: Colors.white),
-                    onPressed: () async {
+                Positioned(
+                  top: 33,
+                  left: 13,
+                  child: GestureDetector(
+                    onTap: () async {
                       final status = await saveVideoToGallery(_videoFile!);
                       if (!mounted) return;
+
+                      String msg = '';
                       if (status == 1) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Đã lưu video vào thư viện')),
-                        );
+                        msg = 'Đã lưu video vào thư viện';
                       } else if (status == 0) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Lưu video thất bại')),
-                        );
+                        msg = 'Lưu video thất bại';
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Chưa cấp quyền lưu video')),
-                        );
+                        msg = 'Chưa cấp quyền';
                       }
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(msg)),
+                      );
                     },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        shape: BoxShape.circle,
+                      ),
+                      padding: const EdgeInsets.all(6),
+                      child: const Icon(
+                        Icons.download,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
                   ),
                 ),
             ],
           ),
-          if (widget.enableEdit) ...[
-            const SizedBox(height: 10),
-            ElevatedButton.icon(
-              onPressed: _pickVideo,
-              icon: const Icon(Icons.video_library),
-              label: const Text('Video đẹp nhất hôm nay'),
-            ),
-            const SizedBox(height: 10),
-            if (_videoFile != null)
-              ElevatedButton.icon(
-                onPressed: _deleteVideo,
-                icon: const Icon(Icons.delete),
-                label: const Text('Xóa video hiện tại'),
-              )
-          ],
-        ],
+        ),
       ),
     );
   }
