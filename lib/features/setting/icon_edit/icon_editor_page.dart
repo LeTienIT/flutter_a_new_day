@@ -34,6 +34,11 @@ class _IconEditorPageState extends ConsumerState<IconEditorPage> {
     });
   }
 
+  @override
+  void dispose(){
+    super.dispose();
+    _hideOverlay();
+  }
   void _showOverlay(BuildContext context, WidgetRef ref) {
     final overlay = Overlay.of(context);
 
@@ -97,9 +102,8 @@ class _IconEditorPageState extends ConsumerState<IconEditorPage> {
   Future<List<String>> loadStickerAssets() async {
     final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
 
-    return manifest.listAssets()
-        .where((e) => e.startsWith('assets/sticker/'))
-        .toList();
+    return manifest.listAssets().where((e) => e.startsWith('assets/sticker/') &&
+        (e.endsWith('.png') || e.endsWith('.jpg') || e.endsWith('.jpeg'))).toList();
   }
   void _showStickerPicker(BuildContext context, WidgetRef ref) async {
     final stickers = await loadStickerAssets();
@@ -192,103 +196,111 @@ class _IconEditorPageState extends ConsumerState<IconEditorPage> {
         appBar: AppBar(
           title: const Text('Chỉnh sửa nhật ký'),
         ),
-        body: SingleChildScrollView(
-          physics: _isInteracting ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ChoiceChip(
-                    label: const Text('Trang bìa'),
-                    selected: state.selectedPage == 1,
-                    onSelected: (_) {
-                      notifier.setPage(1);
-                    },
-                  ),
-                  const SizedBox(width: 10),
-                  ChoiceChip(
-                    label: const Text('Trang cuối'),
-                    selected: state.selectedPage == 2,
-                    onSelected: (_) {
-                      notifier.setPage(2);
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 5,),
-              const Text("Di chuyển, phóng to/thu nhỏ, ấn giữ để xoá",style: TextStyle(color: Colors.redAccent),),
-              const Text("Nên dùng các ảnh không có nền",style: TextStyle(color: Colors.green),),
-              Center(
-                child: Container(
-                  width: maxWidth,
-                  height: maxHeight,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: state.isLoading ? const Center(child: CircularProgressIndicator()) : Stack(
-                      children: [
-                        state.selectedPage==1 ?_buildPreviewBackground(ref, gradientAsync, textColor) : _buildPreviewCoverPage(ref, textColor),
-
-                        for (final icon in state.icons)
-                          _DraggableItem(
-                            key: ValueKey(icon.id),
-                            icon: icon,
-                            onMove: (x, y) async {
-                              ref.read(fileIconProvider.notifier).updatePosition(icon.id, x, y);
-                            },
-                            onResize: (w, h) async {
-                              ref.read(fileIconProvider.notifier).updateSize(icon.id, w, h);
-                            },
-                            onDelete: () async {
-                              ref.read(fileIconProvider.notifier).delete(icon.id);
-                            },
-                            onInteractionStart: () {
-                              setState(() => _isInteracting = true);
-                            },
-                            onInteractionEnd: () {
-                              setState(() => _isInteracting = false);
-                            },
-                          )
-                      ],
+        body: GestureDetector(
+          onTap: (){
+            _hideOverlay();
+          },
+          child: SingleChildScrollView(
+            physics: _isInteracting ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ChoiceChip(
+                      label: const Text('Trang bìa'),
+                      selected: state.selectedPage == 1,
+                      onSelected: (_) {
+                        notifier.setPage(1);
+                      },
                     ),
-                  ),
+                    const SizedBox(width: 10),
+                    ChoiceChip(
+                      label: const Text('Trang cuối'),
+                      selected: state.selectedPage == 2,
+                      onSelected: (_) {
+                        notifier.setPage(2);
+                      },
+                    ),
+                  ],
                 ),
-              ),
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 5),
-                child: CompositedTransformTarget(
-                  link: _layerLink,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      if (_overlayEntry == null) {
-                        _showOverlay(context, ref);
-                      } else {
-                        _hideOverlay();
-                      }
-                    },
-                    icon: const Icon(Icons.add, size: 14),
-                    label: const Text("Thêm sticker"),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(10),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
+                const SizedBox(height: 5,),
+                const Text("Di chuyển, phóng to/thu nhỏ, ấn giữ để xoá",style: TextStyle(color: Colors.redAccent),),
+                const Text("Nên dùng các ảnh không có nền",style: TextStyle(color: Colors.green),),
+                Center(
+                  child: Container(
+                    width: maxWidth,
+                    height: maxHeight,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: state.isLoading ? const Center(child: CircularProgressIndicator()) : Stack(
+                        children: [
+                          state.selectedPage==1 ?_buildPreviewBackground(ref, gradientAsync, textColor) : _buildPreviewCoverPage(ref, textColor),
+
+                          for (final icon in state.icons)
+                            _DraggableItem(
+                              key: ValueKey(icon.id),
+                              icon: icon,
+                              onMove: (x, y) async {
+                                ref.read(fileIconProvider.notifier).updatePosition(icon.id, x, y);
+                              },
+                              onResize: (w, h) async {
+                                ref.read(fileIconProvider.notifier).updateSize(icon.id, w, h);
+                              },
+                              onRotation: (r) async {
+                                ref.read(fileIconProvider.notifier).updateRotation(icon.id, r);
+                              },
+                              onDelete: () async {
+                                ref.read(fileIconProvider.notifier).delete(icon.id);
+                              },
+                              onInteractionStart: () {
+                                setState(() => _isInteracting = true);
+                              },
+                              onInteractionEnd: () {
+                                setState(() => _isInteracting = false);
+                              },
+                            )
+                        ],
                       ),
                     ),
                   ),
                 ),
-              ),
-              _buildColorSettings(context, ref, gradientAsync, textColorAsync, textColor),
-              if(state.selectedPage==2)CoverTextEditor(),
-              SizedBox(height: 40,),
-            ],
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 5),
+                  child: CompositedTransformTarget(
+                    link: _layerLink,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        if (_overlayEntry == null) {
+                          _showOverlay(context, ref);
+                        } else {
+                          _hideOverlay();
+                        }
+                      },
+                      icon: const Icon(Icons.add, size: 14),
+                      label: const Text("Thêm sticker"),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(10),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                _buildColorSettings(context, ref, gradientAsync, textColorAsync, textColor),
+                if(state.selectedPage==2)CoverTextEditor(),
+                SizedBox(height: 40,),
+              ],
+            ),
           ),
         ),
       ),
@@ -579,6 +591,7 @@ class _DraggableItem extends StatefulWidget {
   final FileIcon icon;
   final Function(double x, double y) onMove;
   final Function(double w, double h) onResize;
+  final Function(double r) onRotation;
   final VoidCallback? onDelete;
   final VoidCallback? onInteractionStart;
   final VoidCallback? onInteractionEnd;
@@ -588,6 +601,7 @@ class _DraggableItem extends StatefulWidget {
     required this.icon,
     required this.onMove,
     required this.onResize,
+    required this.onRotation,
     this.onDelete,
     this.onInteractionEnd,
     this.onInteractionStart
@@ -605,7 +619,8 @@ class _DraggableItemState extends State<_DraggableItem> {
   double baseWidth = 0;
   double baseHeight = 0;
 
-
+  double rotation = 0;
+  double baseRotation = 0;
   @override
   void initState() {
     super.initState();
@@ -613,6 +628,7 @@ class _DraggableItemState extends State<_DraggableItem> {
     y = widget.icon.posY * maxHeight;
     w = widget.icon.width * maxWidth;
     h = widget.icon.height * maxHeight;
+    rotation = widget.icon.rotation;
   }
 
 
@@ -631,12 +647,15 @@ class _DraggableItemState extends State<_DraggableItem> {
           HapticFeedback.vibrate();
           baseWidth = w;
           baseHeight = h;
+
+          baseRotation = rotation;
+
           widget.onInteractionStart?.call();
         },
         onScaleEnd: (details) {
           widget.onInteractionEnd?.call();
         },
-        onLongPress: () async{
+        onDoubleTap: () async{
           HapticFeedback.vibrate();
           widget.onInteractionEnd?.call();
           final confirm = await showDialog<bool>(
@@ -670,6 +689,8 @@ class _DraggableItemState extends State<_DraggableItem> {
             w = (baseWidth * details.scale).clamp(40, 200);
             h = (baseHeight * details.scale).clamp(40, 200);
 
+            rotation = baseRotation + details.rotation;
+
             x = x.clamp(0, maxWidth - w);
             y = y.clamp(0, maxHeight - h);
           });
@@ -677,6 +698,7 @@ class _DraggableItemState extends State<_DraggableItem> {
           if (widget.icon.id > 0) {
             widget.onMove(x, y);
             widget.onResize(w, h);
+            widget.onRotation(rotation);
           }
         },
 
@@ -687,9 +709,16 @@ class _DraggableItemState extends State<_DraggableItem> {
         child: SizedBox(
           width: w,
           height: h,
-          child: Image.file(
-            File(widget.icon.path),
-            fit: BoxFit.contain,
+          child: Transform.rotate(
+            angle: rotation,
+            child: SizedBox(
+              width: w,
+              height: h,
+              child: Image.file(
+                File(widget.icon.path),
+                fit: BoxFit.contain,
+              ),
+            ),
           ),
         ),
       ),

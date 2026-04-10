@@ -1821,6 +1821,18 @@ class $FileIconsTable extends FileIcons
     requiredDuringInsert: false,
     defaultValue: const Constant(80),
   );
+  static const VerificationMeta _rotationMeta = const VerificationMeta(
+    'rotation',
+  );
+  @override
+  late final GeneratedColumn<double> rotation = GeneratedColumn<double>(
+    'rotation',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0.0),
+  );
   static const VerificationMeta _pageMeta = const VerificationMeta('page');
   @override
   late final GeneratedColumn<int> page = GeneratedColumn<int>(
@@ -1838,6 +1850,7 @@ class $FileIconsTable extends FileIcons
     posY,
     width,
     height,
+    rotation,
     page,
   ];
   @override
@@ -1891,6 +1904,12 @@ class $FileIconsTable extends FileIcons
         height.isAcceptableOrUnknown(data['height']!, _heightMeta),
       );
     }
+    if (data.containsKey('rotation')) {
+      context.handle(
+        _rotationMeta,
+        rotation.isAcceptableOrUnknown(data['rotation']!, _rotationMeta),
+      );
+    }
     if (data.containsKey('page')) {
       context.handle(
         _pageMeta,
@@ -1938,6 +1957,11 @@ class $FileIconsTable extends FileIcons
             DriftSqlType.double,
             data['${effectivePrefix}height'],
           )!,
+      rotation:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.double,
+            data['${effectivePrefix}rotation'],
+          )!,
       page:
           attachedDatabase.typeMapping.read(
             DriftSqlType.int,
@@ -1959,6 +1983,7 @@ class FileIcon extends DataClass implements Insertable<FileIcon> {
   final double posY;
   final double width;
   final double height;
+  final double rotation;
   final int page;
   const FileIcon({
     required this.id,
@@ -1967,6 +1992,7 @@ class FileIcon extends DataClass implements Insertable<FileIcon> {
     required this.posY,
     required this.width,
     required this.height,
+    required this.rotation,
     required this.page,
   });
   @override
@@ -1978,6 +2004,7 @@ class FileIcon extends DataClass implements Insertable<FileIcon> {
     map['pos_y'] = Variable<double>(posY);
     map['width'] = Variable<double>(width);
     map['height'] = Variable<double>(height);
+    map['rotation'] = Variable<double>(rotation);
     map['page'] = Variable<int>(page);
     return map;
   }
@@ -1990,6 +2017,7 @@ class FileIcon extends DataClass implements Insertable<FileIcon> {
       posY: Value(posY),
       width: Value(width),
       height: Value(height),
+      rotation: Value(rotation),
       page: Value(page),
     );
   }
@@ -2006,6 +2034,7 @@ class FileIcon extends DataClass implements Insertable<FileIcon> {
       posY: serializer.fromJson<double>(json['posY']),
       width: serializer.fromJson<double>(json['width']),
       height: serializer.fromJson<double>(json['height']),
+      rotation: serializer.fromJson<double>(json['rotation']),
       page: serializer.fromJson<int>(json['page']),
     );
   }
@@ -2019,6 +2048,7 @@ class FileIcon extends DataClass implements Insertable<FileIcon> {
       'posY': serializer.toJson<double>(posY),
       'width': serializer.toJson<double>(width),
       'height': serializer.toJson<double>(height),
+      'rotation': serializer.toJson<double>(rotation),
       'page': serializer.toJson<int>(page),
     };
   }
@@ -2030,6 +2060,7 @@ class FileIcon extends DataClass implements Insertable<FileIcon> {
     double? posY,
     double? width,
     double? height,
+    double? rotation,
     int? page,
   }) => FileIcon(
     id: id ?? this.id,
@@ -2038,6 +2069,7 @@ class FileIcon extends DataClass implements Insertable<FileIcon> {
     posY: posY ?? this.posY,
     width: width ?? this.width,
     height: height ?? this.height,
+    rotation: rotation ?? this.rotation,
     page: page ?? this.page,
   );
   FileIcon copyWithCompanion(FileIconsCompanion data) {
@@ -2048,6 +2080,7 @@ class FileIcon extends DataClass implements Insertable<FileIcon> {
       posY: data.posY.present ? data.posY.value : this.posY,
       width: data.width.present ? data.width.value : this.width,
       height: data.height.present ? data.height.value : this.height,
+      rotation: data.rotation.present ? data.rotation.value : this.rotation,
       page: data.page.present ? data.page.value : this.page,
     );
   }
@@ -2061,13 +2094,15 @@ class FileIcon extends DataClass implements Insertable<FileIcon> {
           ..write('posY: $posY, ')
           ..write('width: $width, ')
           ..write('height: $height, ')
+          ..write('rotation: $rotation, ')
           ..write('page: $page')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, path, posX, posY, width, height, page);
+  int get hashCode =>
+      Object.hash(id, path, posX, posY, width, height, rotation, page);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2078,6 +2113,7 @@ class FileIcon extends DataClass implements Insertable<FileIcon> {
           other.posY == this.posY &&
           other.width == this.width &&
           other.height == this.height &&
+          other.rotation == this.rotation &&
           other.page == this.page);
 }
 
@@ -2088,6 +2124,7 @@ class FileIconsCompanion extends UpdateCompanion<FileIcon> {
   final Value<double> posY;
   final Value<double> width;
   final Value<double> height;
+  final Value<double> rotation;
   final Value<int> page;
   const FileIconsCompanion({
     this.id = const Value.absent(),
@@ -2096,6 +2133,7 @@ class FileIconsCompanion extends UpdateCompanion<FileIcon> {
     this.posY = const Value.absent(),
     this.width = const Value.absent(),
     this.height = const Value.absent(),
+    this.rotation = const Value.absent(),
     this.page = const Value.absent(),
   });
   FileIconsCompanion.insert({
@@ -2105,6 +2143,7 @@ class FileIconsCompanion extends UpdateCompanion<FileIcon> {
     required double posY,
     this.width = const Value.absent(),
     this.height = const Value.absent(),
+    this.rotation = const Value.absent(),
     required int page,
   }) : path = Value(path),
        posX = Value(posX),
@@ -2117,6 +2156,7 @@ class FileIconsCompanion extends UpdateCompanion<FileIcon> {
     Expression<double>? posY,
     Expression<double>? width,
     Expression<double>? height,
+    Expression<double>? rotation,
     Expression<int>? page,
   }) {
     return RawValuesInsertable({
@@ -2126,6 +2166,7 @@ class FileIconsCompanion extends UpdateCompanion<FileIcon> {
       if (posY != null) 'pos_y': posY,
       if (width != null) 'width': width,
       if (height != null) 'height': height,
+      if (rotation != null) 'rotation': rotation,
       if (page != null) 'page': page,
     });
   }
@@ -2137,6 +2178,7 @@ class FileIconsCompanion extends UpdateCompanion<FileIcon> {
     Value<double>? posY,
     Value<double>? width,
     Value<double>? height,
+    Value<double>? rotation,
     Value<int>? page,
   }) {
     return FileIconsCompanion(
@@ -2146,6 +2188,7 @@ class FileIconsCompanion extends UpdateCompanion<FileIcon> {
       posY: posY ?? this.posY,
       width: width ?? this.width,
       height: height ?? this.height,
+      rotation: rotation ?? this.rotation,
       page: page ?? this.page,
     );
   }
@@ -2171,6 +2214,9 @@ class FileIconsCompanion extends UpdateCompanion<FileIcon> {
     if (height.present) {
       map['height'] = Variable<double>(height.value);
     }
+    if (rotation.present) {
+      map['rotation'] = Variable<double>(rotation.value);
+    }
     if (page.present) {
       map['page'] = Variable<int>(page.value);
     }
@@ -2186,6 +2232,7 @@ class FileIconsCompanion extends UpdateCompanion<FileIcon> {
           ..write('posY: $posY, ')
           ..write('width: $width, ')
           ..write('height: $height, ')
+          ..write('rotation: $rotation, ')
           ..write('page: $page')
           ..write(')'))
         .toString();
@@ -3220,6 +3267,7 @@ typedef $$FileIconsTableCreateCompanionBuilder =
       required double posY,
       Value<double> width,
       Value<double> height,
+      Value<double> rotation,
       required int page,
     });
 typedef $$FileIconsTableUpdateCompanionBuilder =
@@ -3230,6 +3278,7 @@ typedef $$FileIconsTableUpdateCompanionBuilder =
       Value<double> posY,
       Value<double> width,
       Value<double> height,
+      Value<double> rotation,
       Value<int> page,
     });
 
@@ -3269,6 +3318,11 @@ class $$FileIconsTableFilterComposer
 
   ColumnFilters<double> get height => $composableBuilder(
     column: $table.height,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get rotation => $composableBuilder(
+    column: $table.rotation,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3317,6 +3371,11 @@ class $$FileIconsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get rotation => $composableBuilder(
+    column: $table.rotation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get page => $composableBuilder(
     column: $table.page,
     builder: (column) => ColumnOrderings(column),
@@ -3349,6 +3408,9 @@ class $$FileIconsTableAnnotationComposer
 
   GeneratedColumn<double> get height =>
       $composableBuilder(column: $table.height, builder: (column) => column);
+
+  GeneratedColumn<double> get rotation =>
+      $composableBuilder(column: $table.rotation, builder: (column) => column);
 
   GeneratedColumn<int> get page =>
       $composableBuilder(column: $table.page, builder: (column) => column);
@@ -3388,6 +3450,7 @@ class $$FileIconsTableTableManager
                 Value<double> posY = const Value.absent(),
                 Value<double> width = const Value.absent(),
                 Value<double> height = const Value.absent(),
+                Value<double> rotation = const Value.absent(),
                 Value<int> page = const Value.absent(),
               }) => FileIconsCompanion(
                 id: id,
@@ -3396,6 +3459,7 @@ class $$FileIconsTableTableManager
                 posY: posY,
                 width: width,
                 height: height,
+                rotation: rotation,
                 page: page,
               ),
           createCompanionCallback:
@@ -3406,6 +3470,7 @@ class $$FileIconsTableTableManager
                 required double posY,
                 Value<double> width = const Value.absent(),
                 Value<double> height = const Value.absent(),
+                Value<double> rotation = const Value.absent(),
                 required int page,
               }) => FileIconsCompanion.insert(
                 id: id,
@@ -3414,6 +3479,7 @@ class $$FileIconsTableTableManager
                 posY: posY,
                 width: width,
                 height: height,
+                rotation: rotation,
                 page: page,
               ),
           withReferenceMapper:

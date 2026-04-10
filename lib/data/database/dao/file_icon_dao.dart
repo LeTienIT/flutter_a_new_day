@@ -17,6 +17,7 @@ class FileIconDao extends DatabaseAccessor<AppDatabase>
     required int page,
     double width = 80.0 / 350,
     double height = 80.0 / 550,
+    double rotation = 0,
   }) {
     return into(fileIcons).insert(
       FileIconsCompanion(
@@ -26,6 +27,7 @@ class FileIconDao extends DatabaseAccessor<AppDatabase>
         page: Value(page),
         width: Value(width),
         height: Value(height),
+        rotation: Value(rotation)
       ),
     );
   }
@@ -83,6 +85,14 @@ class FileIconDao extends DatabaseAccessor<AppDatabase>
       FileIconsCompanion(
         width: Value(w),
         height: Value(h),
+      ),
+    );
+  }
+
+  Future<void> updateRotation(int id, double rotation) {
+    return (update(fileIcons)..where((tbl) => tbl.id.equals(id))).write(
+      FileIconsCompanion(
+        rotation: Value(rotation),
       ),
     );
   }

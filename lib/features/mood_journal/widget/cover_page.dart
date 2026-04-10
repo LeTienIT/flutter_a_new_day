@@ -36,10 +36,13 @@ class CoverPageView extends ConsumerWidget {
                 Positioned(
                   left: icon.posX * screenWidth,
                   top: icon.posY * screenHeight,
-                  child: SizedBox(
-                    width: icon.width * screenWidth,
-                    height: icon.height * screenHeight,
-                    child: Image.file(File(icon.path), fit: BoxFit.contain),
+                  child: Transform.rotate(
+                    angle: icon.rotation,
+                    child: SizedBox(
+                      width: icon.width * screenWidth,
+                      height: icon.height * screenHeight,
+                      child: Image.file(File(icon.path), fit: BoxFit.contain),
+                    ),
                   ),
                 ),
               Center(

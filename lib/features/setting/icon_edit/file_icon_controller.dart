@@ -84,6 +84,19 @@ class FileIconNotifier extends StateNotifier<FileIconState> {
     await dao.updateSize(id, ratioW, ratioH);
   }
 
+  Future<void> updateRotation(int id, double r ) async {
+    state = state.copyWith(
+      icons: state.icons.map((e) {
+        if (e.id == id) {
+          return e.copyWith(rotation: r);
+        }
+        return e;
+      }).toList(),
+    );
+
+    await dao.updateRotation(id, r);
+  }
+
   /// delete
   Future<void> delete(int id) async {
     final item = state.icons.firstWhere((e) => e.id == id);

@@ -18,45 +18,7 @@ import '../mood_widget/input_audio.dart';
 import '../mood_widget/video_input.dart';
 import '../widget/cover_page.dart';
 import '../widget/first_page.dart';
-
-class TripleTapBackWrapper extends StatefulWidget {
-  final Widget child;
-
-  const TripleTapBackWrapper({super.key, required this.child});
-
-  @override
-  State<TripleTapBackWrapper> createState() => _TripleTapBackWrapperState();
-}
-
-class _TripleTapBackWrapperState extends State<TripleTapBackWrapper> {
-  int _tapCount = 0;
-  DateTime? _lastTap;
-
-  void _handleTap(BuildContext context) {
-    final now = DateTime.now();
-
-    if (_lastTap == null ||
-        now.difference(_lastTap!) > const Duration(seconds: 1)) {
-      _tapCount = 0;
-    }
-
-    _tapCount++;
-    _lastTap = now;
-
-    if (_tapCount >= 3) {
-      Navigator.pop(context);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Listener(
-      behavior: HitTestBehavior.translucent,
-      onPointerDown: (_) => _handleTap(context),
-      child: widget.child,
-    );
-  }
-}
+import '../widget/tap_widget.dart';
 
 class MoodViewScreen extends ConsumerStatefulWidget {
   final MoodModel mood;
@@ -66,8 +28,6 @@ class MoodViewScreen extends ConsumerStatefulWidget {
   @override
   ConsumerState<MoodViewScreen> createState() => _MoodViewScreenState();
 }
-
-
 class _MoodViewScreenState extends ConsumerState<MoodViewScreen> {
 
   final _controller = GlobalKey<PageFlipWidgetState>();
@@ -77,9 +37,7 @@ class _MoodViewScreenState extends ConsumerState<MoodViewScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        showTopToast(context, "Chạm 3 lần để quay lại");
-      });
+      showTopToast(context, "Chạm 3 lần liên tiếp để quay lại");
     });
 
     Future.microtask(() {
@@ -92,6 +50,9 @@ class _MoodViewScreenState extends ConsumerState<MoodViewScreen> {
     MoodModel? mCurrent = widget.mood;
 
     return TripleTapBackWrapper(
+      onHandel: (){
+        Navigator.pop(context);
+      },
       child: SafeArea(
         top: false,
         child: Scaffold(

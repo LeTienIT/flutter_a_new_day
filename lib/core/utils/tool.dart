@@ -165,39 +165,121 @@ void showTopToast(BuildContext context, String message) {
 
   entry = OverlayEntry(
     builder: (context) {
-      return Positioned(
-        top: MediaQuery.of(context).padding.top + 10, // tránh tai thỏ
-        left: 20,
-        right: 20,
-        child: Material(
-          color: Colors.transparent,
-          child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 300),
-            opacity: 1,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.black87,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                message,
-                style: const TextStyle(color: Colors.white),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-        ),
-      );
+      return _ToastWidget(message: message, onEnd: () => entry.remove());
     },
   );
 
   overlay.insert(entry);
+}
 
-  Future.delayed(const Duration(seconds: 2), () {
-    entry.remove();
+class _ToastWidget extends StatefulWidget {
+  final String message;
+  final VoidCallback onEnd;
+
+  const _ToastWidget({
+    required this.message,
+    required this.onEnd,
   });
+
+  @override
+  State<_ToastWidget> createState() => _ToastWidgetState();
+}
+class _ToastWidgetState extends State<_ToastWidget> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _opacity;
+  late Animation<Offset> _offset;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
+    _opacity = Tween(begin: 0.0, end: 1.0).animate(_controller);
+
+    _offset = Tween(
+      begin: const Offset(0, -0.2),
+      end: Offset.zero,
+    ).animate(_controller);
+
+    _controller.forward();
+
+    Future.delayed(const Duration(seconds: 2), () async {
+      await _controller.reverse();
+      widget.onEnd();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 20,
+      left: 0,
+      right: 0,
+      child: Material(
+        color: Colors.transparent,
+        child: Center( // 🔥 căn giữa
+          child: FadeTransition(
+            opacity: _opacity,
+            child: SlideTransition(
+              position: _offset,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 280),
+                child: IntrinsicWidth( // 🔥 co theo nội dung
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF7F00FF),
+                          Color(0xFFE100FF),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.purple.withOpacity(0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min, // 🔥 quan trọng
+                      children: [
+                        const Icon(Icons.touch_app,
+                            color: Colors.white, size: 18),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            widget.message,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

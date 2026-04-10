@@ -11,5 +11,7 @@ class FileIcons extends Table {
   RealColumn get width => real().withDefault(const Constant(80))();
   RealColumn get height => real().withDefault(const Constant(80))();
 
+  RealColumn get rotation => real().withDefault(const Constant(0.0))();
+
   IntColumn get page => integer()(); // trang (1 = first, 2 = last)
 }
