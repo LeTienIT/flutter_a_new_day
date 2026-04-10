@@ -225,7 +225,7 @@ class _IconEditorPageState extends ConsumerState<IconEditorPage> {
                   ],
                 ),
                 const SizedBox(height: 5,),
-                const Text("Di chuyển, phóng to/thu nhỏ, ấn giữ để xoá",style: TextStyle(color: Colors.redAccent),),
+                const Text("Di chuyển, phóng to/thu nhỏ, xoay, ấn liên tiếp để xoá",style: TextStyle(color: Colors.redAccent),),
                 const Text("Nên dùng các ảnh không có nền",style: TextStyle(color: Colors.green),),
                 Center(
                   child: Container(
