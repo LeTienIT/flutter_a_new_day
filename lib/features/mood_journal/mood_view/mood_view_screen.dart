@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:page_flip/page_flip.dart';
 import '../../../core/utils/tool.dart';
+import '../../setting/icon_edit/file_icon_controller.dart';
 import '../mood_list/mood_list_controller.dart';
 import '../mood_widget/build_content_list_page.dart';
 import '../mood_widget/build_cover_page.dart';
@@ -79,6 +80,10 @@ class _MoodViewScreenState extends ConsumerState<MoodViewScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         showTopToast(context, "Chạm 3 lần để quay lại");
       });
+    });
+
+    Future.microtask(() {
+      ref.read(fileIconProvider.notifier).load(isAll: true);
     });
   }
 

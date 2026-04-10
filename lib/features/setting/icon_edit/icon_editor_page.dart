@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/const/setting_const.dart';
@@ -17,6 +21,10 @@ class IconEditorPage extends ConsumerStatefulWidget {
 }
 
 class _IconEditorPageState extends ConsumerState<IconEditorPage> {
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+  bool _isInteracting = false;
+
   @override
   void initState() {
     super.initState();
@@ -24,6 +32,147 @@ class _IconEditorPageState extends ConsumerState<IconEditorPage> {
     Future.microtask(() {
       ref.read(fileIconProvider.notifier).load();
     });
+  }
+
+  void _showOverlay(BuildContext context, WidgetRef ref) {
+    final overlay = Overlay.of(context);
+
+    final renderBox = context.findRenderObject() as RenderBox;
+    final size = renderBox.size;
+    final position = renderBox.localToGlobal(Offset.zero);
+
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    final showAbove = position.dy + size.height + 200 > screenHeight;
+
+    final offset = showAbove
+        ? const Offset(0, -120)
+        : const Offset(0, 50);  // hi
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) {
+        return Positioned(
+          width: 220,
+          child: CompositedTransformFollower(
+            link: _layerLink,
+            offset: offset,
+            child: Material(
+              elevation: 6,
+              borderRadius: BorderRadius.circular(12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.emoji_emotions),
+                    title: const Text("Chọn từ hệ thống"),
+                    onTap: () async {
+                      _hideOverlay();
+                      _showStickerPicker(context, ref);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text("Chọn từ thư viện"),
+                    onTap: () async {
+                      _hideOverlay();
+                      await ref.read(fileIconProvider.notifier).pickAndInsertImages();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    overlay.insert(_overlayEntry!);
+  }
+
+  void _hideOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  Future<List<String>> loadStickerAssets() async {
+    final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
+
+    return manifest.listAssets()
+        .where((e) => e.startsWith('assets/sticker/'))
+        .toList();
+  }
+  void _showStickerPicker(BuildContext context, WidgetRef ref) async {
+    final stickers = await loadStickerAssets();
+    final selected = <String>{};
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return SizedBox(
+              height: 400,
+              child: Column(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Text("Chọn sticker"),
+                  ),
+                  Expanded(
+                    child: GridView.builder(
+                      gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                      ),
+                      itemCount: stickers.length,
+                      itemBuilder: (_, index) {
+                        final path = stickers[index];
+                        final isSelected = selected.contains(path);
+
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (isSelected) {
+                                selected.remove(path);
+                              } else {
+                                selected.add(path);
+                              }
+                            });
+                          },
+                          child: Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(6),
+                                child: Image.asset(path),
+                              ),
+                              if (isSelected)
+                                const Positioned(
+                                  right: 4,
+                                  top: 4,
+                                  child: Icon(Icons.check_circle,
+                                      color: Colors.green),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      await ref.read(fileIconProvider.notifier).insertFromAssets(selected.toList());
+                    },
+                    child: const Text("Xong"),
+                  )
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -44,6 +193,7 @@ class _IconEditorPageState extends ConsumerState<IconEditorPage> {
           title: const Text('Chỉnh sửa nhật ký'),
         ),
         body: SingleChildScrollView(
+          physics: _isInteracting ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
           child: Column(
             children: [
               Row(
@@ -97,6 +247,12 @@ class _IconEditorPageState extends ConsumerState<IconEditorPage> {
                             onDelete: () async {
                               ref.read(fileIconProvider.notifier).delete(icon.id);
                             },
+                            onInteractionStart: () {
+                              setState(() => _isInteracting = true);
+                            },
+                            onInteractionEnd: () {
+                              setState(() => _isInteracting = false);
+                            },
                           )
                       ],
                     ),
@@ -104,27 +260,34 @@ class _IconEditorPageState extends ConsumerState<IconEditorPage> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(top: 10,bottom: 10),
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    await ref.read(fileIconProvider.notifier).pickAndInsertImages();
-                  },
-                  icon: const Icon(Icons.add, size: 20),
-                  label: const Text("Thêm sticker"),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(16),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                margin: const EdgeInsets.symmetric(vertical: 5),
+                child: CompositedTransformTarget(
+                  link: _layerLink,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      if (_overlayEntry == null) {
+                        _showOverlay(context, ref);
+                      } else {
+                        _hideOverlay();
+                      }
+                    },
+                    icon: const Icon(Icons.add, size: 14),
+                    label: const Text("Thêm sticker"),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(10),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Colors.white,
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                   ),
                 ),
               ),
               _buildColorSettings(context, ref, gradientAsync, textColorAsync, textColor),
               if(state.selectedPage==2)CoverTextEditor(),
-
+              SizedBox(height: 40,),
             ],
           ),
         ),
@@ -417,6 +580,8 @@ class _DraggableItem extends StatefulWidget {
   final Function(double x, double y) onMove;
   final Function(double w, double h) onResize;
   final VoidCallback? onDelete;
+  final VoidCallback? onInteractionStart;
+  final VoidCallback? onInteractionEnd;
 
   const _DraggableItem({
     super.key,
@@ -424,6 +589,8 @@ class _DraggableItem extends StatefulWidget {
     required this.onMove,
     required this.onResize,
     this.onDelete,
+    this.onInteractionEnd,
+    this.onInteractionStart
   });
 
   @override
@@ -456,11 +623,22 @@ class _DraggableItemState extends State<_DraggableItem> {
       left: x,
       top: y,
       child: GestureDetector(
+        onTapDown: (_) {
+          HapticFeedback.vibrate();
+        },
+
         onScaleStart: (details) {
+          HapticFeedback.vibrate();
           baseWidth = w;
           baseHeight = h;
+          widget.onInteractionStart?.call();
+        },
+        onScaleEnd: (details) {
+          widget.onInteractionEnd?.call();
         },
         onLongPress: () async{
+          HapticFeedback.vibrate();
+          widget.onInteractionEnd?.call();
           final confirm = await showDialog<bool>(
             context: context,
             builder: (_) => AlertDialog(
@@ -502,11 +680,15 @@ class _DraggableItemState extends State<_DraggableItem> {
           }
         },
 
+        onTapCancel: (){
+          widget.onInteractionEnd?.call();
+        },
+
         child: SizedBox(
           width: w,
           height: h,
-          child: Image.asset(
-            widget.icon.path,
+          child: Image.file(
+            File(widget.icon.path),
             fit: BoxFit.contain,
           ),
         ),

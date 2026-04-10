@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -131,6 +133,53 @@ class FileIconNotifier extends StateNotifier<FileIconState> {
         page: state.selectedPage,
       );
     }
+
+    await load();
+  }
+
+  Future<void> insertFromAssets(List<String> assets) async {
+    if (assets.isEmpty) return;
+
+    state = state.copyWith(isLoading: true);
+
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final uuid = const Uuid();
+
+      const defaultX = 100.0;
+      const defaultY = 150.0;
+
+      await Future.wait(
+        assets.map((assetPath) async {
+          try {
+            final byteData = await rootBundle.load(assetPath);
+
+            final bytes = byteData.buffer.asUint8List();
+
+            final ext = p.extension(assetPath).isEmpty ? ".png" : p.extension(assetPath);
+            final newName = "${uuid.v4()}$ext";
+            final newPath = "${dir.path}/$newName";
+
+            final file = File(newPath);
+            await file.writeAsBytes(bytes, flush: true);
+
+            // 🔥 Insert DB
+            await dao.insertIcon(
+              path: newName,
+              x: defaultX / maxWidth,
+              y: defaultY / maxHeight,
+              page: state.selectedPage,
+            );
+          } catch (e) {
+            debugPrint("Insert asset error ($assetPath): $e");
+          }
+        }),
+      );
+    } catch (e) {
+      debugPrint("insertFromAssets error: $e");
+    }
+
+    state = state.copyWith(isLoading: false);
 
     await load();
   }
