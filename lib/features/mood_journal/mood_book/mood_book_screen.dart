@@ -8,6 +8,8 @@ import '../mood_widget/build_content_list_page.dart';
 import '../mood_widget/build_cover_page.dart';
 import '../mood_widget/build_first_page.dart';
 import '../mood_widget/build_media_page.dart';
+import '../widget/cover_page.dart';
+import '../widget/first_page.dart';
 
 class MoodBookScreen extends ConsumerStatefulWidget {
   final List<MoodModel> listMood;
@@ -78,7 +80,7 @@ class _MoodBookScreenState extends ConsumerState<MoodBookScreen> {
           child: PageFlipWidget(
             key: controller,
             backgroundColor: const Color(0xFFFBF6EF),
-            lastPage: buildCoverPage(),
+            lastPage: CoverPageView(),
             children: pages!,
           ),
         ),
@@ -92,7 +94,7 @@ class _MoodBookScreenState extends ConsumerState<MoodBookScreen> {
     for (int i = 0; i < widget.listMood.length; i++) {
       final mood = widget.listMood[i];
 
-      pages.add(buildFirstPage(m: mood,));
+      pages.add(FirstPageView(m: mood,));
 
       pages.addAll(buildNotePages(context, mood.note));
 
